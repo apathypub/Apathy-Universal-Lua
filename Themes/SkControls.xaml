@@ -1,0 +1,361 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:Apathy.Controls">
+
+    <!-- Templates for the custom Sk* controls in /Controls. -->
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Apathy;component/Themes/Controls.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- ============================ Shared parts ============================ -->
+
+    <Style x:Key="Sk.InvisibleToggle" TargetType="ToggleButton">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="Transparent"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The closed dropdown box: dark gradient + little pixel arrow. -->
+    <Style x:Key="Sk.ComboToggle" TargetType="ToggleButton">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Bd" Background="{StaticResource Sk.Combo}"
+                            BorderBrush="{StaticResource Sk.Black}" BorderThickness="1">
+                        <Path x:Name="Arrow" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0"
+                              Data="M0,0 L5,0 L2.5,3 Z" Fill="#979797" RenderOptions.EdgeMode="Aliased"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Sk.Combo.Hover}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Arrow" Property="Data" Value="M0,3 L5,3 L2.5,0 Z"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- "-" / "+" shown beside a slider while hovered. -->
+    <Style x:Key="Sk.SliderStep" TargetType="RepeatButton">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Foreground" Value="#6E6E6E"/>
+        <Setter Property="Delay" Value="350"/>
+        <Setter Property="Interval" Value="40"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border Background="Transparent" Padding="2,0">
+                        <TextBlock Text="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ============================ Slider ============================ -->
+
+    <Style TargetType="c:SkSlider">
+        <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+        <Setter Property="Margin" Value="20,0,30,5"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="c:SkSlider">
+                    <StackPanel Background="Transparent">
+                        <TextBlock x:Name="HeaderText" Text="{TemplateBinding Header}" Margin="0,0,0,3"/>
+                        <Grid x:Name="PART_Area" Height="14" Background="Transparent">
+                            <Border x:Name="PART_Bar" Height="7" VerticalAlignment="Top"
+                                    BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                    Background="{StaticResource Sk.Slider.Track}">
+                                <Border x:Name="PART_Fill" HorizontalAlignment="Left" Width="0"
+                                        Background="{DynamicResource Sk.Accent.Gradient}"/>
+                            </Border>
+                            <Canvas IsHitTestVisible="False">
+                                <c:OutlinedText x:Name="PART_Value" Canvas.Top="0" Text="{TemplateBinding ValueText}"
+                                                Fill="{StaticResource Sk.Text}" FontSize="10"/>
+                            </Canvas>
+                            <RepeatButton x:Name="PART_Decrease" Content="-" Style="{StaticResource Sk.SliderStep}"
+                                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-12,-4,0,0"
+                                          Visibility="Hidden"/>
+                            <RepeatButton x:Name="PART_Increase" Content="+" Style="{StaticResource Sk.SliderStep}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-13,0"
+                                          Visibility="Hidden"/>
+                        </Grid>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Header" Value="{x:Null}">
+                            <Setter TargetName="HeaderText" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PART_Decrease" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="PART_Increase" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================ Dropdowns ============================ -->
+
+    <Style TargetType="c:SkComboBox">
+        <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+        <Setter Property="Margin" Value="20,0,30,6"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="MaxDropDownHeight" Value="220"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="c:SkComboBox">
+                    <StackPanel>
+                        <TextBlock x:Name="HeaderText" Text="{TemplateBinding Header}" Margin="0,0,0,3"/>
+                        <Grid x:Name="Box" Height="20">
+                            <ToggleButton Style="{StaticResource Sk.ComboToggle}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <ContentPresenter IsHitTestVisible="False" Margin="8,0,20,0"
+                                              HorizontalAlignment="Left" VerticalAlignment="Center"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              TextElement.Foreground="{StaticResource Sk.TextMuted}"/>
+                            <!-- Nothing selected: "-" like SkMultiCombo. -->
+                            <TextBlock x:Name="Placeholder" Text="-" IsHitTestVisible="False" Margin="8,0,20,0"
+                                       VerticalAlignment="Center" Foreground="{StaticResource Sk.TextMuted}"
+                                       Visibility="Collapsed"/>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" Focusable="False"
+                                   PopupAnimation="None" c:PopupTracker.TrackWindow="True"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Border LayoutTransform="{DynamicResource Sk.Scale}"
+                                        MinWidth="{Binding ActualWidth, ElementName=Box}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        Background="{StaticResource Sk.PopupBg}"
+                                        BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                        TextOptions.TextFormattingMode="Display">
+                                    <ScrollViewer Style="{StaticResource Sk.ScrollViewer}">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Header" Value="{x:Null}">
+                            <Setter TargetName="HeaderText" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="SelectedIndex" Value="-1">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="c:SkMultiCombo">
+        <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+        <Setter Property="Margin" Value="20,0,30,6"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="c:SkMultiCombo">
+                    <StackPanel>
+                        <TextBlock x:Name="HeaderText" Text="{TemplateBinding Header}" Margin="0,0,0,3"/>
+                        <Grid x:Name="Box" Height="20">
+                            <!-- Opens on release: with ClickMode=Press the toggle still holds mouse capture when the
+                                 popup opens, so the popup can't take it and a click outside wouldn't close it. -->
+                            <ToggleButton Style="{StaticResource Sk.ComboToggle}" ClickMode="Release"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          IsHitTestVisible="{Binding IsOpen, ElementName=PART_Popup, Converter={StaticResource Sk.InverseBool}}"/>
+                            <TextBlock IsHitTestVisible="False" Margin="8,0,20,0" VerticalAlignment="Center"
+                                       Text="{TemplateBinding DisplayText}" TextTrimming="CharacterEllipsis"
+                                       Foreground="{StaticResource Sk.TextMuted}"/>
+                            <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" StaysOpen="False"
+                                   PopupAnimation="None" c:PopupTracker.TrackWindow="True"
+                                   IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Border LayoutTransform="{DynamicResource Sk.Scale}"
+                                        MinWidth="{Binding ActualWidth, ElementName=Box}"
+                                        Background="{StaticResource Sk.PopupBg}"
+                                        BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                        TextOptions.TextFormattingMode="Display">
+                                    <!-- Plain rows (no buttons): SkMultiCombo handles press + drag selection itself. -->
+                                    <ItemsControl x:Name="PART_Items" ItemsSource="{TemplateBinding ItemsSource}"
+                                                  Background="Transparent">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="Row" Height="20" Padding="8,0" Background="Transparent">
+                                                    <TextBlock x:Name="Label" Text="{Binding Name}" VerticalAlignment="Center"
+                                                               Foreground="{StaticResource Sk.Text}"/>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Row" Property="Background" Value="{StaticResource Sk.PopupHover}"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource Sk.Accent}"/>
+                                                        <Setter TargetName="Label" Property="FontWeight" Value="Bold"/>
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Header" Value="{x:Null}">
+                            <Setter TargetName="HeaderText" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================ Color picker ============================ -->
+
+    <Style TargetType="c:SkColorPicker">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="c:SkColorPicker">
+                    <Grid Width="18" Height="10">
+                        <Border BorderBrush="{StaticResource Sk.Black}" BorderThickness="1" Background="{StaticResource Sk.Checker}">
+                            <Border Background="{TemplateBinding SwatchBrush}"/>
+                        </Border>
+                        <ToggleButton x:Name="PART_Toggle" Style="{StaticResource Sk.InvisibleToggle}"
+                                      IsHitTestVisible="{Binding IsOpen, ElementName=PART_Popup, Converter={StaticResource Sk.InverseBool}}"/>
+                        <Popup x:Name="PART_Popup" Placement="Bottom" VerticalOffset="2" AllowsTransparency="True"
+                               StaysOpen="False" PopupAnimation="None" c:PopupTracker.TrackWindow="True"
+                               IsOpen="{Binding IsChecked, ElementName=PART_Toggle, Mode=TwoWay}">
+                            <Border LayoutTransform="{DynamicResource Sk.Scale}" Background="{StaticResource Sk.PopupBg}"
+                                    BorderBrush="{StaticResource Sk.Black}" BorderThickness="1" Padding="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="5"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="5"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- saturation / value -->
+                                    <Border BorderBrush="{StaticResource Sk.Black}" BorderThickness="1">
+                                        <Grid x:Name="PART_Sv" Width="150" Height="150" ClipToBounds="True"
+                                              Background="{TemplateBinding HueBrush}">
+                                            <Rectangle>
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Offset="0" Color="#FFFFFFFF"/>
+                                                        <GradientStop Offset="1" Color="#00FFFFFF"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+                                            <Rectangle>
+                                                <Rectangle.Fill>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                        <GradientStop Offset="0" Color="#00000000"/>
+                                                        <GradientStop Offset="1" Color="#FF000000"/>
+                                                    </LinearGradientBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+                                            <Canvas IsHitTestVisible="False">
+                                                <Border x:Name="PART_SvMarker" Width="5" Height="5"
+                                                        BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                                        Background="#E6E6E6"/>
+                                            </Canvas>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- hue -->
+                                    <Border Grid.Column="2" BorderBrush="{StaticResource Sk.Black}" BorderThickness="1">
+                                        <Grid x:Name="PART_Hue" Width="10" Height="150" ClipToBounds="True"
+                                              Background="{StaticResource Sk.HueStrip}">
+                                            <Canvas IsHitTestVisible="False">
+                                                <Border x:Name="PART_HueMarker" Width="10" Height="3"
+                                                        BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                                        Background="#E6E6E6"/>
+                                            </Canvas>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- alpha -->
+                                    <Border x:Name="AlphaRow" Grid.Row="2" BorderBrush="{StaticResource Sk.Black}" BorderThickness="1">
+                                        <Grid x:Name="PART_Alpha" Width="150" Height="10" ClipToBounds="True"
+                                              Background="{StaticResource Sk.Checker}">
+                                            <Border Background="{TemplateBinding AlphaBrush}"/>
+                                            <Canvas IsHitTestVisible="False">
+                                                <Border x:Name="PART_AlphaMarker" Width="3" Height="10"
+                                                        BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                                                        Background="#E6E6E6"/>
+                                            </Canvas>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowAlpha" Value="False">
+                            <Setter TargetName="AlphaRow" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================ Keybind ============================ -->
+
+    <Style TargetType="c:SkKeybind">
+        <Setter Property="Foreground" Value="{StaticResource Sk.TextBind}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="c:SkKeybind">
+                    <Border Background="Transparent" Padding="2,0,0,0">
+                        <TextBlock Text="{TemplateBinding DisplayText}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+            </Trigger>
+            <Trigger Property="IsCapturing" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource Sk.Accent}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

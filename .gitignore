@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+artifacts/
+*.user
+.vs/
+.vscode/
+.idea/
+
+# Runtime data created next to the executable: never commit it
+users.json
+login.json
+*.key
+configs/
+agents/
+data/
+.env

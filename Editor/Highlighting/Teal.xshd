@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Teal" extensions=".tl" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A9955" />
+  <Color name="String" foreground="#CE9178" />
+  <Color name="Number" foreground="#B5CEA8" />
+  <Color name="Keyword" foreground="#C586C0" />
+  <Color name="Constant" foreground="#569CD6" />
+  <Color name="Builtin" foreground="#DCDCAA" />
+  <Color name="Type" foreground="#4EC9B0" />
+
+  <RuleSet>
+    <Span color="Comment" multiline="true" begin="--\[=*\[" end="\]=*\]" />
+    <Span color="Comment" begin="--" />
+    <Span color="String" multiline="true" begin="\[=*\[" end="\]=*\]" />
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords color="Keyword">
+      <Word>and</Word><Word>as</Word><Word>break</Word><Word>do</Word><Word>else</Word><Word>elseif</Word>
+      <Word>end</Word><Word>enum</Word><Word>for</Word><Word>function</Word><Word>global</Word><Word>goto</Word>
+      <Word>if</Word><Word>in</Word><Word>interface</Word><Word>is</Word><Word>local</Word><Word>not</Word>
+      <Word>or</Word><Word>record</Word><Word>repeat</Word><Word>return</Word><Word>then</Word><Word>type</Word>
+      <Word>until</Word><Word>where</Word><Word>while</Word>
+    </Keywords>
+    <Keywords color="Constant">
+      <Word>nil</Word><Word>true</Word><Word>false</Word><Word>self</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>number</Word><Word>integer</Word><Word>string</Word><Word>boolean</Word><Word>any</Word>
+      <Word>thread</Word><Word>userdata</Word>
+    </Keywords>
+    <Keywords color="Builtin">
+      <Word>print</Word><Word>pairs</Word><Word>ipairs</Word><Word>next</Word><Word>tostring</Word>
+      <Word>tonumber</Word><Word>select</Word><Word>error</Word><Word>assert</Word><Word>pcall</Word>
+      <Word>xpcall</Word><Word>setmetatable</Word><Word>getmetatable</Word><Word>require</Word><Word>string</Word>
+      <Word>table</Word><Word>math</Word><Word>os</Word><Word>coroutine</Word><Word>utf8</Word>
+    </Keywords>
+    <Rule color="Number">\b0[xX][0-9a-fA-F]+\b|\b\d+(\.\d+)?([eE][+-]?\d+)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Luau" extensions=".luau" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A9955" />
+  <Color name="String" foreground="#CE9178" />
+  <Color name="Number" foreground="#B5CEA8" />
+  <Color name="Keyword" foreground="#C586C0" />
+  <Color name="Constant" foreground="#569CD6" />
+  <Color name="Builtin" foreground="#DCDCAA" />
+  <Color name="Type" foreground="#4EC9B0" />
+
+  <RuleSet>
+    <Span color="Comment" multiline="true" begin="--\[=*\[" end="\]=*\]" />
+    <Span color="Comment" begin="--" />
+    <Span color="String" multiline="true" begin="\[=*\[" end="\]=*\]" />
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <!-- Interpolated strings: `hello {name}` -->
+    <Span color="String">
+      <Begin>`</Begin>
+      <End>`</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords color="Keyword">
+      <Word>and</Word><Word>break</Word><Word>continue</Word><Word>do</Word><Word>else</Word><Word>elseif</Word>
+      <Word>end</Word><Word>export</Word><Word>for</Word><Word>function</Word><Word>if</Word><Word>in</Word>
+      <Word>local</Word><Word>not</Word><Word>or</Word><Word>repeat</Word><Word>return</Word><Word>then</Word>
+      <Word>type</Word><Word>until</Word><Word>while</Word>
+    </Keywords>
+    <Keywords color="Constant">
+      <Word>nil</Word><Word>true</Word><Word>false</Word><Word>self</Word>
+    </Keywords>
+    <Keywords color="Type">
+      <Word>number</Word><Word>string</Word><Word>boolean</Word><Word>any</Word><Word>unknown</Word>
+      <Word>never</Word><Word>thread</Word><Word>buffer</Word><Word>vector</Word>
+    </Keywords>
+    <Keywords color="Builtin">
+      <Word>print</Word><Word>warn</Word><Word>pairs</Word><Word>ipairs</Word><Word>next</Word><Word>typeof</Word>
+      <Word>tostring</Word><Word>tonumber</Word><Word>select</Word><Word>error</Word><Word>assert</Word>
+      <Word>pcall</Word><Word>xpcall</Word><Word>setmetatable</Word><Word>getmetatable</Word><Word>require</Word>
+      <Word>string</Word><Word>table</Word><Word>math</Word><Word>os</Word><Word>coroutine</Word><Word>utf8</Word>
+      <Word>bit32</Word><Word>task</Word><Word>game</Word><Word>workspace</Word><Word>script</Word>
+      <Word>Instance</Word><Word>Vector2</Word><Word>Vector3</Word><Word>CFrame</Word><Word>Color3</Word>
+      <Word>UDim</Word><Word>UDim2</Word><Word>Enum</Word>
+    </Keywords>
+    <Rule color="Number">\b0[xXbB][0-9a-fA-F_]+\b|\b\d[\d_]*(\.[\d_]+)?([eE][+-]?\d+)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="MoonScript" extensions=".moon" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A9955" />
+  <Color name="String" foreground="#CE9178" />
+  <Color name="Number" foreground="#B5CEA8" />
+  <Color name="Keyword" foreground="#C586C0" />
+  <Color name="Constant" foreground="#569CD6" />
+  <Color name="Builtin" foreground="#DCDCAA" />
+  <Color name="Member" foreground="#9CDCFE" />
+  <Color name="Operator" foreground="#D4D4D4" fontWeight="bold" />
+
+  <RuleSet>
+    <Span color="Comment" begin="--" />
+    <Span color="String" multiline="true" begin="\[=*\[" end="\]=*\]" />
+    <Span color="String" multiline="true">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords color="Keyword">
+      <Word>and</Word><Word>break</Word><Word>class</Word><Word>continue</Word><Word>do</Word><Word>else</Word>
+      <Word>elseif</Word><Word>export</Word><Word>extends</Word><Word>for</Word><Word>from</Word><Word>if</Word>
+      <Word>import</Word><Word>in</Word><Word>local</Word><Word>not</Word><Word>or</Word><Word>return</Word>
+      <Word>switch</Word><Word>then</Word><Word>unless</Word><Word>using</Word><Word>when</Word><Word>while</Word>
+      <Word>with</Word>
+    </Keywords>
+    <Keywords color="Constant">
+      <Word>nil</Word><Word>true</Word><Word>false</Word><Word>self</Word><Word>super</Word>
+    </Keywords>
+    <Keywords color="Builtin">
+      <Word>print</Word><Word>pairs</Word><Word>ipairs</Word><Word>next</Word><Word>type</Word>
+      <Word>tostring</Word><Word>tonumber</Word><Word>error</Word><Word>assert</Word><Word>pcall</Word>
+      <Word>setmetatable</Word><Word>getmetatable</Word><Word>require</Word><Word>string</Word><Word>table</Word>
+      <Word>math</Word><Word>os</Word><Word>coroutine</Word>
+    </Keywords>
+    <!-- @field / @@classfield -->
+    <Rule color="Member">@@?[A-Za-z_]\w*</Rule>
+    <Rule color="Operator">[=-]&gt;</Rule>
+    <Rule color="Number">\b0[xX][0-9a-fA-F]+\b|\b\d+(\.\d+)?([eE][+-]?\d+)?\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>

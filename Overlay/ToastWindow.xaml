@@ -1,0 +1,60 @@
+<Window x:Class="Apathy.Overlay.ToastWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:s="clr-namespace:Apathy.Services"
+        Title="apathy notifications"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="{StaticResource Sk.Font}"
+        FontSize="{StaticResource Sk.FontSize}"
+        Foreground="{StaticResource Sk.Text}">
+
+    <ItemsControl ItemsSource="{x:Static s:NotificationService.Items}" Margin="8,2,8,8"
+                  LayoutTransform="{DynamicResource Sk.Scale}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type s:Toast}">
+                <Border Width="290" Margin="0,6,0,0" BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                        Background="{StaticResource Sk.GroupBg}" MouseLeftButtonUp="Toast_Click">
+                    <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="Bar" Background="{DynamicResource Sk.Accent}"/>
+                            <StackPanel Grid.Column="1" Margin="10,7,10,8">
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Message}" Margin="0,3,0,0" TextWrapping="Wrap"
+                                           Foreground="{StaticResource Sk.TextMuted}"/>
+                                <UniformGrid Rows="1" Margin="0,8,0,0"
+                                             Visibility="{Binding IsQuestion, Converter={StaticResource Sk.BoolToVis}}">
+                                    <Button Content="Accept" Margin="0,0,4,0" Click="Accept_Click"/>
+                                    <Button Content="Decline" Margin="4,0,0,0" Click="Decline_Click"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Border>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Kind}" Value="Success">
+                        <Setter TargetName="Bar" Property="Background" Value="#5BD65B"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}" Value="Error">
+                        <Setter TargetName="Bar" Property="Background" Value="#E8404A"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Kind}" Value="Question">
+                        <Setter TargetName="Bar" Property="Background" Value="#E8C440"/>
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</Window>

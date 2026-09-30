@@ -1,0 +1,111 @@
+<Window x:Class="Apathy.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="apathy"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Sk.Outline}"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        FontFamily="{StaticResource Sk.Font}"
+        FontSize="{StaticResource Sk.FontSize}"
+        Foreground="{StaticResource Sk.Text}">
+
+    <Window.Resources>
+        <!-- Small "x" glyph in the top-right corner. -->
+        <Style x:Key="CloseButton" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Foreground" Value="{StaticResource Sk.TextMuted}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="7">
+                            <TextBlock Text="&#xE8BB;" FontFamily="{StaticResource Sk.IconFont}" FontSize="10"
+                                       Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <!-- Same frame as MainWindow: 1px outline, 1px light, 4px mid, 1px light, gradient strip on top. -->
+    <Border Width="340" LayoutTransform="{DynamicResource Sk.Scale}"
+            BorderBrush="{StaticResource Sk.Outline}" BorderThickness="1">
+        <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
+            <Border BorderBrush="{StaticResource Sk.Frame.Mid}" BorderThickness="4">
+                <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
+                    <Grid Background="{StaticResource Sk.Black}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1"/>
+                            <RowDefinition Height="1"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Background="{StaticResource Sk.Rainbow}"/>
+                        <Border Grid.Row="1" Background="{StaticResource Sk.Rainbow}" Opacity="0.5"/>
+
+                        <Grid Grid.Row="2" Background="{DynamicResource Sk.Pattern}">
+                            <StackPanel>
+                                <!-- "thy" gets a moving shine (see StartLogoShine). -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,22"
+                                            TextElement.FontSize="26" TextElement.FontWeight="Bold">
+                                    <TextBlock Text="apa"/>
+                                    <TextBlock x:Name="LogoAccent" Text="thy" Foreground="{DynamicResource Sk.Accent}"/>
+                                </StackPanel>
+
+                                <!-- Both groups share one cell; the hidden one keeps its size so the window
+                                     doesn't jump when switching from login to loading. -->
+                                <Grid Margin="22,0,22,22">
+                                    <GroupBox x:Name="LoginGroup" Header="Login">
+                                        <StackPanel Margin="0,2,0,0">
+                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Username"/>
+                                            <TextBox x:Name="UsernameBox" Height="22"/>
+                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Password"/>
+                                            <PasswordBox x:Name="PasswordInput" Height="22"/>
+                                            <CheckBox x:Name="RememberBox" Content="Remember me" Margin="0,2,0,6"/>
+                                            <Button x:Name="LoginButton" Content="Login" IsDefault="True" Height="27"
+                                                    Margin="20,4,30,6" Click="Login_Click"/>
+                                            <TextBlock x:Name="Status" Margin="20,0,30,4" TextWrapping="Wrap" Visibility="Collapsed"/>
+                                        </StackPanel>
+                                    </GroupBox>
+
+                                    <GroupBox x:Name="LoadingGroup" Header="Loading" Visibility="Hidden">
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock x:Name="WelcomeText" Style="{StaticResource Sk.Label}" Margin="20,0,30,10"/>
+                                            <Grid Margin="20,0,30,5">
+                                                <TextBlock x:Name="LoadingStep" Foreground="{StaticResource Sk.TextMuted}"/>
+                                                <TextBlock x:Name="LoadingPercent" HorizontalAlignment="Right"
+                                                           Foreground="{StaticResource Sk.TextMuted}"/>
+                                            </Grid>
+                                            <Border Height="7" Margin="20,0,30,6" BorderBrush="{StaticResource Sk.Black}"
+                                                    BorderThickness="1" Background="{StaticResource Sk.Slider.Track}">
+                                                <Border Background="{DynamicResource Sk.Accent.Gradient}" RenderTransformOrigin="0,0.5">
+                                                    <Border.RenderTransform>
+                                                        <ScaleTransform x:Name="ProgressScale" ScaleX="0"/>
+                                                    </Border.RenderTransform>
+                                                </Border>
+                                            </Border>
+                                        </StackPanel>
+                                    </GroupBox>
+                                </Grid>
+                            </StackPanel>
+
+                            <Button Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Margin="0,2,2,0" ToolTip="Close" AutomationProperties.Name="Close" Click="Close_Click"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
+        </Border>
+    </Border>
+</Window>

@@ -1,0 +1,92 @@
+<UserControl x:Class="Apathy.Views.MiscPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Apathy.Controls">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="18"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- For scripts with the "chat" permission (CsChat sends only say / say_team). -->
+            <GroupBox Grid.Row="2" Header="CS2">
+                <StackPanel>
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Chat port"/>
+                        <TextBox Width="64" HorizontalAlignment="Right" Margin="0,0,30,0"
+                                 Text="{Binding NetconPort, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,30,2" TextWrapping="Wrap"
+                               Foreground="{StaticResource Sk.TextMuted}"
+                               Text="Scripts that write in the chat need this CS2 launch option (Steam, CS2, Properties):"/>
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,30,4" FontFamily="Consolas"
+                               Text="-netconport 2121"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Miscellaneous">
+                <StackPanel>
+                    <CheckBox Content="Auto start" IsChecked="{Binding AutoStart}" Click="AutoStart_Click"
+                              ToolTip="Start apathy when Windows starts"/>
+                    <CheckBox Content="Notifications" IsChecked="{Binding Notifications}"
+                              ToolTip="Pop-ups when scripts load, fail or ask for something"/>
+                    <c:SkSlider Header="Volume" Suffix="%" Minimum="0" Maximum="100" Value="{Binding Volume}"/>
+                </StackPanel>
+            </GroupBox>
+
+        </Grid>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Settings">
+                <StackPanel>
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Menu key"/>
+                        <c:SkKeybind Keybind="{Binding MenuKey}" AllowModes="False" AllowEmpty="False"/>
+                    </Grid>
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Menu color"/>
+                        <c:SkColorPicker Color="{Binding MenuColor}" ShowAlpha="False"/>
+                    </Grid>
+                    <c:SkComboBox Header="DPI scale" SelectedIndex="{Binding DpiScale}">
+                        <ComboBoxItem Content="100%"/>
+                        <ComboBoxItem Content="125%"/>
+                        <ComboBoxItem Content="150%"/>
+                        <ComboBoxItem Content="175%"/>
+                        <ComboBoxItem Content="200%"/>
+                    </c:SkComboBox>
+                    <CheckBox Content="Watermark" IsChecked="{Binding Watermark}"/>
+                    <Button Content="Exit" Click="Exit_Click"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Grid.Row="2" Header="Island">
+                <StackPanel>
+                    <CheckBox Content="Show island" IsChecked="{Binding ShowIsland}"/>
+                    <CheckBox Content="Lock island position" IsChecked="{Binding LockIsland}"/>
+                    <CheckBox Content="ChatLive shortcut" IsChecked="{Binding IslandChatLive}"/>
+                    <CheckBox Content="Scripts shortcut" IsChecked="{Binding IslandScripts}"/>
+                    <CheckBox Content="Editor shortcut" IsChecked="{Binding IslandEditor}"/>
+                    <CheckBox Content="Active scripts" IsChecked="{Binding IslandActiveScripts}"
+                              ToolTip="Show the currently loaded scripts on the island"/>
+                    <Button Content="Reset island position" Click="ResetIsland_Click"/>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>

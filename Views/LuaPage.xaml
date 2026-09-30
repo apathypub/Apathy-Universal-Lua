@@ -1,0 +1,124 @@
+<UserControl x:Class="Apathy.Views.LuaPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="clr-namespace:Apathy.Services">
+    <!-- Managing scripts (list, details, log). Their options live in the General tab. -->
+    <UserControl.Resources>
+        <Style x:Key="DetailValue" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Foreground" Value="{StaticResource Sk.TextMuted}"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="18"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Scripts">
+            <StackPanel>
+                <!-- Loaded scripts are drawn in the accent color. -->
+                <ListBox x:Name="ScriptList" Height="150" SelectionChanged="ScriptList_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="IntBadge" Background="#27AE60" CornerRadius="2"
+                                        Padding="3,0" Margin="0,0,5,0" Visibility="Collapsed">
+                                    <TextBlock Text="INT" FontSize="9" FontWeight="Bold" Foreground="White"/>
+                                </Border>
+                                <TextBlock x:Name="Name" Text="{Binding Name}"/>
+                            </StackPanel>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsLoaded}" Value="True">
+                                    <Setter TargetName="Name" Property="Foreground" Value="{DynamicResource Sk.Accent}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsInternal}" Value="True">
+                                    <Setter TargetName="IntBadge" Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button x:Name="LoadButton" Content="Load script" IsEnabled="False" Click="Load_Click"/>
+                <Button Content="Open in editor" Click="OpenEditor_Click"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="ShareButton" Content="Share" Margin="20,2,6,6" IsEnabled="False"
+                            Click="Share_Click" ToolTip="Copy this script to the clipboard so you can send it to someone"/>
+                    <Button Grid.Column="1" Content="Import" Margin="6,2,30,6" Click="Import_Click"
+                            ToolTip="Add a script someone shared with you (from the clipboard)"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="Refresh" Margin="20,2,4,6" Click="Refresh_Click"/>
+                    <Button Grid.Column="1" Content="Folder" Margin="4,2,4,6" Click="OpenFolder_Click"
+                            ToolTip="Open the scripts folder"/>
+                    <Button Grid.Column="2" x:Name="DeleteButton" Content="Delete" Margin="4,2,30,6" IsEnabled="False"
+                            Click="Delete_Click" ToolTip="Permanently delete the selected script file"/>
+                </Grid>
+                <TextBlock x:Name="ShareStatus" Style="{StaticResource Sk.Label}" Margin="20,0,30,2" TextWrapping="Wrap"
+                           Foreground="{StaticResource Sk.TextMuted}"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Column="2" Header="Script">
+            <StackPanel>
+                <TextBlock x:Name="TitleValue" Margin="20,2,30,2" FontWeight="Bold" TextTrimming="CharacterEllipsis"
+                           Text="Select a script"/>
+                <TextBlock x:Name="BylineValue" Style="{StaticResource Sk.Label}" Margin="20,0,30,6"
+                           Foreground="{StaticResource Sk.TextMuted}"/>
+                <TextBlock x:Name="DescriptionValue" Style="{StaticResource Sk.Label}" Margin="20,0,30,8" TextWrapping="Wrap"
+                           Visibility="Collapsed"/>
+                <Grid Margin="0,0,0,6">
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="File"/>
+                    <TextBlock x:Name="NameValue" Style="{StaticResource DetailValue}" Margin="80,0,0,0" Text="-"/>
+                </Grid>
+                <Grid Margin="0,0,0,6">
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Modified"/>
+                    <TextBlock x:Name="ModifiedValue" Style="{StaticResource DetailValue}" Margin="80,0,0,0" Text="-"/>
+                </Grid>
+                <Grid Margin="0,0,0,6">
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Status"/>
+                    <TextBlock x:Name="StatusValue" Style="{StaticResource DetailValue}" Margin="80,0,0,0" Text="-"/>
+                </Grid>
+                <Grid Margin="0,0,0,6">
+                    <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Permissions"/>
+                    <TextBlock x:Name="PermissionsValue" Style="{StaticResource DetailValue}" Margin="100,0,0,0" Text="-"/>
+                </Grid>
+                <Button x:Name="RevokeButton" Content="Reset permissions" IsEnabled="False" Click="Revoke_Click"
+                        ToolTip="Forget what this script was allowed; it asks again next time it starts"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Grid.ColumnSpan="3" Header="Log">
+            <DockPanel>
+                <Button DockPanel.Dock="Bottom" Content="Clear" HorizontalAlignment="Left" Width="90"
+                        Margin="20,4,0,4" Click="Clear_Click"/>
+                <Border Background="{StaticResource Sk.Input}" BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"
+                        Margin="20,2,30,2">
+                    <ScrollViewer x:Name="LogScroll" Style="{StaticResource Sk.ScrollViewer}">
+                        <TextBlock x:Name="LogText" Padding="6,4" TextWrapping="Wrap" FontFamily="Consolas"
+                                   Foreground="{StaticResource Sk.TextMuted}"
+                                   Text="{Binding Text, Source={x:Static s:LuaLog.Instance}, Mode=OneWay}"
+                                   SizeChanged="LogText_SizeChanged"/>
+                    </ScrollViewer>
+                </Border>
+            </DockPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

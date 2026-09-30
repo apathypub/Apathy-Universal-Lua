@@ -1,0 +1,80 @@
+<UserControl x:Class="Apathy.Views.GeneralPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="clr-namespace:Apathy.Services"
+             xmlns:m="clr-namespace:Apathy.Models"
+             xmlns:c="clr-namespace:Apathy.Controls">
+
+    <!-- The scripts' space: every loaded script that uses ui.* gets its own group here. -->
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type m:LuaCheckbox}">
+            <CheckBox Content="{Binding Label}" IsChecked="{Binding Value, Mode=TwoWay}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaSliderControl}">
+            <c:SkSlider Header="{Binding Label}" Minimum="{Binding Min}" Maximum="{Binding Max}"
+                        Suffix="{Binding Suffix}" Decimals="{Binding Decimals}" Value="{Binding Value, Mode=TwoWay}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaButtonControl}">
+            <Button Content="{Binding Label}" Command="{Binding Command}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaKeybindControl}">
+            <Grid Margin="0,0,0,6">
+                <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="{Binding Label}"/>
+                <c:SkKeybind Keybind="{Binding Keybind}"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaComboControl}">
+            <c:SkComboBox Header="{Binding Label}" ItemsSource="{Binding Items}" SelectedIndex="{Binding Index, Mode=TwoWay}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaColorControl}">
+            <Grid Margin="0,0,0,6">
+                <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="{Binding Label}"/>
+                <c:SkColorPicker Color="{Binding Color, Mode=TwoWay}" ShowAlpha="False"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type m:LuaTextControl}">
+            <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,30,4" TextWrapping="Wrap" Text="{Binding Text}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type m:LuaScriptPanel}">
+            <GroupBox Header="{Binding Name}">
+                <ItemsControl ItemsSource="{Binding Controls}"/>
+            </GroupBox>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Nothing loaded yet -->
+        <GroupBox Header="General" VerticalAlignment="Top">
+            <GroupBox.Style>
+                <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type GroupBox}}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasItems, ElementName=Panels}" Value="False">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </GroupBox.Style>
+            <StackPanel>
+                <TextBlock Style="{StaticResource Sk.Label}" Margin="20,2,30,4" TextWrapping="Wrap"
+                           Text="Options of your scripts show up here."/>
+                <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,30,10" TextWrapping="Wrap"
+                           Foreground="{StaticResource Sk.TextMuted}"
+                           Text="Every loaded script that adds controls (ui.checkbox, ui.slider, ui.keybind, ui.button, ui.label) gets its own box. Write a script in the editor or load one in the Lua tab."/>
+                <Button Content="Open editor" Click="OpenEditor_Click"/>
+                <Button Content="Manage scripts" Click="OpenLua_Click"/>
+            </StackPanel>
+        </GroupBox>
+
+        <ScrollViewer Style="{StaticResource Sk.ScrollViewer}">
+            <ItemsControl x:Name="Panels" ItemsSource="{Binding Source={x:Static s:ScriptService.Panels}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <c:TwoColumnPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

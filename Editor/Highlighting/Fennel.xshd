@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Fennel" extensions=".fnl" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A9955" />
+  <Color name="String" foreground="#CE9178" />
+  <Color name="Number" foreground="#B5CEA8" />
+  <Color name="Keyword" foreground="#C586C0" />
+  <Color name="Constant" foreground="#569CD6" />
+  <Color name="Builtin" foreground="#DCDCAA" />
+  <Color name="Symbol" foreground="#9CDCFE" />
+
+  <RuleSet>
+    <Span color="Comment" begin=";" />
+    <Span color="String" multiline="true">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <!-- Special forms and macros, right after an opening paren. -->
+    <Rule color="Keyword">(?&lt;=\()\s*(fn|lambda|λ|let|local|var|set|tset|global|if|when|do|each|for|while|values|match|case|match-try|case-try|doto|-&gt;|-&gt;&gt;|-\?&gt;|-\?&gt;&gt;|require-macros|import-macros|macro|macros|include|quote|collect|icollect|fcollect|accumulate|faccumulate|partial|pick-values|pick-args|length|and|or|not|not=|lua|hashfn|with-open|comment)(?=[\s\)\]])</Rule>
+    <Keywords color="Constant">
+      <Word>nil</Word><Word>true</Word><Word>false</Word>
+    </Keywords>
+    <Keywords color="Builtin">
+      <Word>print</Word><Word>pairs</Word><Word>ipairs</Word><Word>next</Word><Word>type</Word>
+      <Word>tostring</Word><Word>tonumber</Word><Word>error</Word><Word>assert</Word><Word>pcall</Word>
+      <Word>setmetatable</Word><Word>getmetatable</Word><Word>require</Word><Word>string</Word><Word>table</Word>
+      <Word>math</Word><Word>os</Word><Word>coroutine</Word>
+    </Keywords>
+    <!-- :keyword strings -->
+    <Rule color="Symbol">(?&lt;![\w\-]):[\w\-\?!\*&lt;&gt;=]+</Rule>
+    <Rule color="Number">(?&lt;![\w\-])-?(0[xX][0-9a-fA-F]+|\d+(\.\d+)?([eE][+-]?\d+)?)\b</Rule>
+  </RuleSet>
+</SyntaxDefinition>
