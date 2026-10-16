@@ -18,62 +18,64 @@
         FontSize="{StaticResource Sk.FontSize}"
         Foreground="{StaticResource Sk.Text}">
 
-    <!-- Frame: 1px outline, 1px light, 4px mid, 1px light (same layering as the original). -->
+    <!-- Flat forum look: one thin edge, the page colour, a header, then the text nav. -->
     <Border x:Name="Root" Width="660" Height="560"
             LayoutTransform="{DynamicResource Sk.Scale}"
-            BorderBrush="{StaticResource Sk.Outline}" BorderThickness="1">
-        <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
-            <Border BorderBrush="{StaticResource Sk.Frame.Mid}" BorderThickness="4">
-                <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
-                    <Grid Background="{StaticResource Sk.Black}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1"/>
-                            <RowDefinition Height="1"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+            Background="{DynamicResource Sk.Pattern}"
+            BorderBrush="{StaticResource Sk.Line}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                        <!-- gradient strip: bright line + half-brightness line under it -->
-                        <Border Grid.Row="0" Background="{StaticResource Sk.Rainbow}"/>
-                        <Border Grid.Row="1" Background="{StaticResource Sk.Rainbow}" Opacity="0.5"/>
+            <!-- Header: the apathy wordmark with the coral pulse, the user on the right. -->
+            <Grid Grid.Row="0" Margin="18,15,18,4">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="apathy" FontFamily="{StaticResource Sk.Heading}" FontSize="17" FontWeight="Bold"
+                               Foreground="{StaticResource Sk.Text}"/>
+                    <!-- EKG pulse line in coral, like the forum logo. -->
+                    <Polyline Points="0,6 7,6 10,1 14,11 18,6 40,6" Stroke="{StaticResource Sk.Coral}" StrokeThickness="1.4"
+                              VerticalAlignment="Center" Margin="10,2,0,0" StrokeLineJoin="Round"/>
+                </StackPanel>
+                <TextBlock x:Name="UserText" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource Sk.Accent}"/>
+            </Grid>
 
-                        <!-- Tab headers are icons: a TabIcons geometry or a Segoe MDL2 Assets glyph
-                             (the tab template draws either), so each tab also gets a readable name. -->
-                        <TabControl x:Name="MainTabs" Grid.Row="2" AllowDrop="True"
-                                    PreviewMouseLeftButtonDown="MainTabs_PreviewMouseLeftButtonDown"
-                                    PreviewMouseMove="MainTabs_PreviewMouseMove"
-                                    Drop="MainTabs_Drop">
-                            <TabItem x:Name="GeneralTab" Header="&#xE71D;" ToolTip="General" AutomationProperties.Name="General">
-                                <v:GeneralPage/>
-                            </TabItem>
-                            <TabItem x:Name="LuaTab" Header="{x:Static c:TabIcons.Lua}" ToolTip="Lua" AutomationProperties.Name="Lua">
-                                <v:LuaPage/>
-                            </TabItem>
-                            <TabItem x:Name="ChatTab" Header="&#xE8BD;" ToolTip="ChatLive" AutomationProperties.Name="ChatLive">
-                                <v:ChatView BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"/>
-                            </TabItem>
-                            <TabItem Header="&#xE713;" ToolTip="Misc" AutomationProperties.Name="Misc">
-                                <v:MiscPage/>
-                            </TabItem>
-                            <TabItem Header="&#xE74E;" ToolTip="Config" AutomationProperties.Name="Config">
-                                <v:ConfigPage/>
-                            </TabItem>
-                        </TabControl>
+            <!-- Tab headers are lowercase text (the nav bar is drawn by the TabControl template). -->
+            <TabControl x:Name="MainTabs" Grid.Row="1" AllowDrop="True"
+                        PreviewMouseLeftButtonDown="MainTabs_PreviewMouseLeftButtonDown"
+                        PreviewMouseMove="MainTabs_PreviewMouseMove"
+                        Drop="MainTabs_Drop">
+                <TabItem x:Name="GeneralTab" Header="general" ToolTip="General" AutomationProperties.Name="General">
+                    <v:GeneralPage/>
+                </TabItem>
+                <TabItem x:Name="LuaTab" Header="lua" ToolTip="Lua" AutomationProperties.Name="Lua">
+                    <v:LuaPage/>
+                </TabItem>
+                <TabItem x:Name="ChatTab" Header="chatlive" ToolTip="ChatLive" AutomationProperties.Name="ChatLive">
+                    <v:ChatView BorderBrush="{StaticResource Sk.Black}" BorderThickness="1"/>
+                </TabItem>
+                <TabItem Header="misc" ToolTip="Misc" AutomationProperties.Name="Misc">
+                    <v:MiscPage/>
+                </TabItem>
+                <TabItem Header="config" ToolTip="Config" AutomationProperties.Name="Config">
+                    <v:ConfigPage/>
+                </TabItem>
+            </TabControl>
 
-                        <Thumb x:Name="ResizeGrip" Grid.Row="2" Width="10" Height="10"
-                               HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                               Cursor="SizeNWSE" DragDelta="ResizeGrip_DragDelta">
-                            <Thumb.Template>
-                                <ControlTemplate TargetType="Thumb">
-                                    <Border Background="Transparent">
-                                        <Path Fill="{StaticResource Sk.Frame.Light}" RenderOptions.EdgeMode="Aliased"
-                                              Data="M7,1 h2 v2 h-2 Z M4,4 h2 v2 h-2 Z M7,4 h2 v2 h-2 Z M1,7 h2 v2 h-2 Z M4,7 h2 v2 h-2 Z M7,7 h2 v2 h-2 Z"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Thumb.Template>
-                        </Thumb>
-                    </Grid>
-                </Border>
-            </Border>
-        </Border>
+            <Thumb x:Name="ResizeGrip" Grid.Row="1" Width="10" Height="10"
+                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Cursor="SizeNWSE" DragDelta="ResizeGrip_DragDelta">
+                <Thumb.Template>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Background="Transparent">
+                            <Path Fill="{StaticResource Sk.Line}" RenderOptions.EdgeMode="Aliased"
+                                  Data="M7,1 h2 v2 h-2 Z M4,4 h2 v2 h-2 Z M7,4 h2 v2 h-2 Z M1,7 h2 v2 h-2 Z M4,7 h2 v2 h-2 Z M7,7 h2 v2 h-2 Z"/>
+                        </Border>
+                    </ControlTemplate>
+                </Thumb.Template>
+            </Thumb>
+        </Grid>
     </Border>
 </Window>

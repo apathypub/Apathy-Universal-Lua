@@ -91,40 +91,29 @@
 
     <!-- ============================ Tabs ============================ -->
 
+    <!-- Forum nav: a horizontal row of lowercase text links with a thin separator under
+         it; the selected one is bright with a coral underline. -->
     <Style TargetType="TabControl">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
-        <Setter Property="TabStripPlacement" Value="Left"/>
+        <Setter Property="TabStripPlacement" Value="Top"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
-                    <!-- The texture covers everything; the tab column paints its dark
-                         background per tab so the selected tab "opens" into the page. -->
-                    <Grid Background="{DynamicResource Sk.Pattern}" KeyboardNavigation.TabNavigation="Local">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="75"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <DockPanel LastChildFill="True">
-                            <Border DockPanel.Dock="Top" Height="16" Background="{StaticResource Sk.TabBg}"
-                                    BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,0,1,0">
-                                <Border BorderBrush="{StaticResource Sk.Black}" BorderThickness="0,0,1,0"/>
-                            </Border>
-                            <StackPanel DockPanel.Dock="Top" IsItemsHost="True"/>
-                            <Border Background="{StaticResource Sk.TabBg}"
-                                    BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,0,1,0">
-                                <Border BorderBrush="{StaticResource Sk.Black}" BorderThickness="0,0,1,0"/>
-                            </Border>
-                        </DockPanel>
-                        <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Column="1"
-                                          ContentSource="SelectedContent" Margin="18,18,18,18"/>
-                    </Grid>
+                    <DockPanel Background="{DynamicResource Sk.Pattern}" KeyboardNavigation.TabNavigation="Local">
+                        <Border DockPanel.Dock="Top" Padding="18,0"
+                                BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,0,0,1">
+                            <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
+                        </Border>
+                        <ContentPresenter x:Name="PART_SelectedContentHost"
+                                          ContentSource="SelectedContent" Margin="18,16,18,14"/>
+                    </DockPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- TabItem.Header is an icon glyph (Segoe MDL2 Assets); ToolTip holds the name.
+    <!-- TabItem.Header is the lowercase tab name; ToolTip holds the full name.
          Font/foreground are set on the header presenter only, otherwise they would
          be inherited by the page content. -->
     <Style TargetType="TabItem">
@@ -136,41 +125,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Grid Height="64" Background="Transparent">
-                        <Border x:Name="Inactive" Background="{StaticResource Sk.TabBg}"
-                                BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,0,1,0">
-                            <Border BorderBrush="{StaticResource Sk.Black}" BorderThickness="0,0,1,0"/>
-                        </Border>
-                        <Grid x:Name="Active" Visibility="Collapsed">
-                            <Border Height="1" VerticalAlignment="Top" Margin="0,0,1,0" Background="{StaticResource Sk.Black}"/>
-                            <Border Height="1" Width="1" VerticalAlignment="Top" HorizontalAlignment="Right" Background="{StaticResource Sk.Line}"/>
-                            <Border Height="1" VerticalAlignment="Top" Margin="0,1,0,0" Background="{StaticResource Sk.Line}"/>
-                            <Border Height="1" VerticalAlignment="Bottom" Margin="0,0,0,1" Background="{StaticResource Sk.Line}"/>
-                            <Border Height="1" VerticalAlignment="Bottom" Margin="0,0,1,0" Background="{StaticResource Sk.Black}"/>
-                            <Border Height="1" Width="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="{StaticResource Sk.Line}"/>
-                        </Grid>
-                        <ContentPresenter x:Name="Icon" ContentSource="Header"
-                                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.FontFamily="{StaticResource Sk.IconFont}"
-                                          TextElement.FontSize="30"
-                                          TextElement.Foreground="{StaticResource Sk.Icon}">
-                            <!-- Header can be a glyph string or a Geometry (TabIcons); drawing the geometry
-                                 here makes it take the hover/selected colors set on this presenter. -->
-                            <ContentPresenter.Resources>
-                                <DataTemplate DataType="{x:Type Geometry}">
-                                    <c:GeometryIcon Data="{Binding}" Size="32"/>
-                                </DataTemplate>
-                            </ContentPresenter.Resources>
-                        </ContentPresenter>
+                    <Grid Background="Transparent" Margin="0,0,24,0">
+                        <ContentPresenter x:Name="Label" ContentSource="Header"
+                                          HorizontalAlignment="Center" Margin="0,11,0,10"
+                                          TextElement.FontFamily="{StaticResource Sk.Font}"
+                                          TextElement.FontSize="13"
+                                          TextElement.Foreground="{StaticResource Sk.TextMuted}"/>
+                        <Border x:Name="Underline" Height="2" VerticalAlignment="Bottom" Margin="0,0,0,-1"
+                                Background="{StaticResource Sk.Coral}" Visibility="Collapsed"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Icon" Property="TextElement.Foreground" Value="{StaticResource Sk.Icon.Hover}"/>
+                            <Setter TargetName="Label" Property="TextElement.Foreground" Value="{StaticResource Sk.Text}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Inactive" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="Active" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="Icon" Property="TextElement.Foreground" Value="{StaticResource Sk.Icon.Active}"/>
+                            <Setter TargetName="Label" Property="TextElement.Foreground" Value="{StaticResource Sk.Text}"/>
+                            <Setter TargetName="Underline" Property="Visibility" Value="Visible"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -243,52 +213,27 @@
 
     <!-- ============================ Group box ============================ -->
 
-    <!-- Double 1px border (black + gray) with the bold title sitting in a gap of the top edge.
-         Content scrolls when it doesn't fit, like the original. -->
+    <!-- Forum section: a small muted header with a thin separator under it, no box or fill.
+         Content scrolls when it doesn't fit. -->
     <Style TargetType="GroupBox">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Foreground" Value="{StaticResource Sk.Text}"/>
-        <Setter Property="Padding" Value="12,11,8,6"/>
+        <Setter Property="Padding" Value="2,0,2,0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="GroupBox">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="7"/>
-                            <RowDefinition Height="2"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- sides + bottom -->
-                        <Border Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="3"
-                                Background="{StaticResource Sk.GroupBg}"
-                                BorderBrush="{StaticResource Sk.Black}" BorderThickness="1,0,1,1">
-                            <Border BorderBrush="{StaticResource Sk.Line}" BorderThickness="1,0,1,1"/>
+                    <DockPanel Background="{StaticResource Sk.GroupBg}">
+                        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,0,0,1"
+                                Padding="2,0,2,7" Margin="0,0,0,11">
+                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="False"
+                                              TextElement.FontFamily="{StaticResource Sk.Font}"
+                                              TextElement.FontSize="11"
+                                              TextElement.Foreground="{StaticResource Sk.TextMuted}"/>
                         </Border>
-
-                        <!-- top edge, split around the title -->
-                        <Border Grid.Row="1" Grid.Column="0" Height="1" VerticalAlignment="Top" Background="{StaticResource Sk.Black}"/>
-                        <Border Grid.Row="1" Grid.Column="0" Height="1" VerticalAlignment="Bottom" Margin="1,0,0,0" Background="{StaticResource Sk.Line}"/>
-                        <Border Grid.Row="1" Grid.Column="2" Height="1" VerticalAlignment="Top" Background="{StaticResource Sk.Black}"/>
-                        <Border Grid.Row="1" Grid.Column="2" Height="1" VerticalAlignment="Bottom" Margin="0,0,1,0" Background="{StaticResource Sk.Line}"/>
-
-                        <!-- The title hangs over the top edge. The negative bottom margin keeps its height out of
-                             the row sizing; otherwise an auto-height group spreads it into the 2px edge row and the
-                             black and gray lines drift apart. -->
-                        <ContentPresenter Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" ContentSource="Header"
-                                          Margin="3,1,3,-8" VerticalAlignment="Top" RecognizesAccessKey="False"
-                                          TextElement.FontWeight="Bold"/>
-
-                        <ScrollViewer Grid.Row="2" Grid.ColumnSpan="3" Margin="2,1,2,2"
-                                      Style="{StaticResource Sk.ScrollViewer}">
+                        <ScrollViewer Style="{StaticResource Sk.ScrollViewer}">
                             <ContentPresenter Margin="{TemplateBinding Padding}"/>
                         </ScrollViewer>
-                    </Grid>
+                    </DockPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

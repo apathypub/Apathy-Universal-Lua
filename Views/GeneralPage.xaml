@@ -45,7 +45,7 @@
 
     <Grid>
         <!-- Nothing loaded yet -->
-        <GroupBox Header="General" VerticalAlignment="Top">
+        <GroupBox Header="general" VerticalAlignment="Top">
             <GroupBox.Style>
                 <Style TargetType="GroupBox" BasedOn="{StaticResource {x:Type GroupBox}}">
                     <Setter Property="Visibility" Value="Collapsed"/>

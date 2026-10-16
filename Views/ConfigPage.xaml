@@ -8,7 +8,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Presets">
+        <GroupBox Header="presets">
             <StackPanel>
                 <ListBox x:Name="ConfigList" Height="180" SelectionChanged="ConfigList_SelectionChanged"/>
                 <TextBox x:Name="NameBox"/>
@@ -19,7 +19,7 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Column="2" Header="Sharing">
+        <GroupBox Grid.Column="2" Header="sharing">
             <StackPanel>
                 <Button Content="Import from clipboard" Click="Import_Click"/>
                 <Button Content="Export to clipboard" Click="Export_Click"/>

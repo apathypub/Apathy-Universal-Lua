@@ -7,38 +7,8 @@ namespace Apathy.Themes;
 /// <summary>Replaces the runtime resources declared at the bottom of Palette.xaml.</summary>
 public static class ThemeManager
 {
-    // 4x4 tile for the page background: dark base with a faint diagonal dot pattern.
-    private static readonly byte[,] PatternTile =
-    {
-        { 0x19, 0x13, 0x13, 0x13 },
-        { 0x13, 0x13, 0x16, 0x13 },
-        { 0x13, 0x13, 0x13, 0x13 },
-        { 0x13, 0x16, 0x13, 0x13 },
-    };
-
-    public static void InstallPattern()
-    {
-        const int size = 4;
-        var pixels = new byte[size * size * 4];
-        for (int y = 0; y < size; y++)
-        for (int x = 0; x < size; x++)
-        {
-            int i = (y * size + x) * 4;
-            pixels[i] = pixels[i + 1] = pixels[i + 2] = PatternTile[y, x];
-            pixels[i + 3] = 0xFF;
-        }
-
-        var bitmap = BitmapSource.Create(size, size, 96, 96, PixelFormats.Bgra32, null, pixels, size * 4);
-        var brush = new ImageBrush(bitmap)
-        {
-            TileMode = TileMode.Tile,
-            Viewport = new Rect(0, 0, size, size),
-            ViewportUnits = BrushMappingMode.Absolute,
-            Stretch = Stretch.None,
-        };
-        RenderOptions.SetBitmapScalingMode(brush, BitmapScalingMode.NearestNeighbor);
-        Set("Sk.Pattern", brush);
-    }
+    /// <summary>The page background: flat, like the forum.</summary>
+    public static void InstallPattern() => Set("Sk.Pattern", new SolidColorBrush(Color.FromRgb(0x0F, 0x0E, 0x0E)));
 
     public static void ApplyAccent(Color accent)
     {

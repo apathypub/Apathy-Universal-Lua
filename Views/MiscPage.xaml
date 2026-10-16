@@ -19,7 +19,7 @@
             </Grid.RowDefinitions>
 
             <!-- For scripts with the "chat" permission (CsChat sends only say / say_team). -->
-            <GroupBox Grid.Row="2" Header="CS2">
+            <GroupBox Grid.Row="2" Header="cs2">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Chat port"/>
@@ -34,7 +34,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Miscellaneous">
+            <GroupBox Header="miscellaneous">
                 <StackPanel>
                     <CheckBox Content="Auto start" IsChecked="{Binding AutoStart}" Click="AutoStart_Click"
                               ToolTip="Start apathy when Windows starts"/>
@@ -53,7 +53,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <GroupBox Header="Settings">
+            <GroupBox Header="settings">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <TextBlock Style="{StaticResource Sk.Label}" Margin="20,0,0,0" Text="Menu key"/>
@@ -77,7 +77,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Grid.Row="2" Header="Island">
+            <GroupBox Grid.Row="2" Header="island">
                 <StackPanel>
                     <CheckBox Content="Show island" IsChecked="{Binding ShowIsland}"/>
                     <CheckBox Content="Lock island position" IsChecked="{Binding LockIsland}"/>

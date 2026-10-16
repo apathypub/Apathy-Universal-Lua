@@ -3,79 +3,67 @@
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
                     xmlns:c="clr-namespace:Apathy.Controls">
 
-    <!-- Fonts -->
-    <FontFamily x:Key="Sk.Font">Verdana</FontFamily>
+    <!-- Forum look: flat near-black, monospace body, bold titles, thin separators,
+         coral accent and green names. Matches the apathy.pub forum. -->
+
+    <!-- Fonts: monospace body (the forum's terminal feel); titles are bold. -->
+    <FontFamily x:Key="Sk.Font">Consolas, Cascadia Mono, Courier New</FontFamily>
+    <FontFamily x:Key="Sk.Heading">Segoe UI, Arial</FontFamily>
     <FontFamily x:Key="Sk.IconFont">Segoe MDL2 Assets</FontFamily>
-    <sys:Double x:Key="Sk.FontSize">11</sys:Double>
+    <sys:Double x:Key="Sk.FontSize">12</sys:Double>
 
-    <!-- Window frame (outside -> inside) -->
-    <SolidColorBrush x:Key="Sk.Outline" Color="#0C0C0C"/>
-    <SolidColorBrush x:Key="Sk.Frame.Light" Color="#3C3C3C"/>
-    <SolidColorBrush x:Key="Sk.Frame.Mid" Color="#282828"/>
+    <!-- Window frame: the forum has no box, just the flat page on a thin edge. -->
+    <SolidColorBrush x:Key="Sk.Outline" Color="#000000"/>
+    <SolidColorBrush x:Key="Sk.Frame.Light" Color="#1C1A19"/>
+    <SolidColorBrush x:Key="Sk.Frame.Mid" Color="#0F0E0E"/>
 
-    <!-- Surfaces -->
+    <!-- Surfaces (flat: panels are the page color, told apart by thin lines, not fills) -->
     <SolidColorBrush x:Key="Sk.Black" Color="#000000"/>
-    <SolidColorBrush x:Key="Sk.Line" Color="#303030"/>
-    <SolidColorBrush x:Key="Sk.TabBg" Color="#0C0C0C"/>
-    <SolidColorBrush x:Key="Sk.GroupBg" Color="#171717"/>
-    <SolidColorBrush x:Key="Sk.PopupBg" Color="#232323"/>
-    <SolidColorBrush x:Key="Sk.PopupHover" Color="#1B1B1B"/>
-    <SolidColorBrush x:Key="Sk.Input" Color="#191919"/>
-    <SolidColorBrush x:Key="Sk.ScrollTrack" Color="#121212"/>
-    <SolidColorBrush x:Key="Sk.ScrollThumb.Fill" Color="#3E3E3E"/>
+    <SolidColorBrush x:Key="Sk.Line" Color="#262422"/>
+    <SolidColorBrush x:Key="Sk.TabBg" Color="#0F0E0E"/>
+    <SolidColorBrush x:Key="Sk.GroupBg" Color="#0F0E0E"/>
+    <SolidColorBrush x:Key="Sk.PopupBg" Color="#1A1817"/>
+    <SolidColorBrush x:Key="Sk.PopupHover" Color="#232120"/>
+    <SolidColorBrush x:Key="Sk.Input" Color="#161413"/>
+    <SolidColorBrush x:Key="Sk.ScrollTrack" Color="#0F0E0E"/>
+    <SolidColorBrush x:Key="Sk.ScrollThumb.Fill" Color="#33302E"/>
 
     <!-- Text -->
-    <SolidColorBrush x:Key="Sk.Text" Color="#CDCDCD"/>
-    <SolidColorBrush x:Key="Sk.TextMuted" Color="#999999"/>
-    <SolidColorBrush x:Key="Sk.TextDisabled" Color="#5C5C5C"/>
-    <SolidColorBrush x:Key="Sk.TextBind" Color="#727272"/>
-    <SolidColorBrush x:Key="Sk.TextError" Color="#E8404A"/>
+    <SolidColorBrush x:Key="Sk.Text" Color="#E6E3DF"/>
+    <SolidColorBrush x:Key="Sk.TextMuted" Color="#8A8781"/>
+    <SolidColorBrush x:Key="Sk.TextDisabled" Color="#55524E"/>
+    <SolidColorBrush x:Key="Sk.TextBind" Color="#6C6963"/>
+    <SolidColorBrush x:Key="Sk.TextError" Color="#E8554B"/>
 
-    <!-- Tab icons -->
-    <SolidColorBrush x:Key="Sk.Icon" Color="#5A5A5A"/>
-    <SolidColorBrush x:Key="Sk.Icon.Hover" Color="#B4B4B4"/>
-    <SolidColorBrush x:Key="Sk.Icon.Active" Color="#D2D2D2"/>
+    <!-- Row numbers / dim labels, like the "01 02 03" on the forum -->
+    <SolidColorBrush x:Key="Sk.TextFaint" Color="#4D4A47"/>
 
-    <!-- Control fills -->
-    <LinearGradientBrush x:Key="Sk.Check.Off" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#4B4B4B"/>
-        <GradientStop Offset="1" Color="#333333"/>
-    </LinearGradientBrush>
+    <!-- Coral accent: the active nav underline and the pulse by the logo -->
+    <SolidColorBrush x:Key="Sk.Coral" Color="#E8554B"/>
+
+    <!-- Tab / icon states -->
+    <SolidColorBrush x:Key="Sk.Icon" Color="#6C6963"/>
+    <SolidColorBrush x:Key="Sk.Icon.Hover" Color="#B4B1AC"/>
+    <SolidColorBrush x:Key="Sk.Icon.Active" Color="#E6E3DF"/>
+
+    <!-- Control fills: flat, quiet; the accent shows state. -->
+    <SolidColorBrush x:Key="Sk.Check.Off" Color="#2A2826"/>
     <LinearGradientBrush x:Key="Sk.Check.Hover" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#575757"/>
-        <GradientStop Offset="1" Color="#3D3D3D"/>
+        <GradientStop Offset="0" Color="#343230"/>
+        <GradientStop Offset="1" Color="#2A2826"/>
     </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Slider.Track" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#343434"/>
-        <GradientStop Offset="1" Color="#444444"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Combo" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#1F1F1F"/>
-        <GradientStop Offset="1" Color="#242424"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Combo.Hover" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#252525"/>
-        <GradientStop Offset="1" Color="#2B2B2B"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Button" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#232323"/>
-        <GradientStop Offset="1" Color="#1A1A1A"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Button.Hover" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#2B2B2B"/>
-        <GradientStop Offset="1" Color="#202020"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="Sk.Button.Pressed" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#1A1A1A"/>
-        <GradientStop Offset="1" Color="#232323"/>
-    </LinearGradientBrush>
-    <SolidColorBrush x:Key="Sk.Button.Inner" Color="#323232"/>
+    <SolidColorBrush x:Key="Sk.Slider.Track" Color="#2A2826"/>
+    <SolidColorBrush x:Key="Sk.Combo" Color="#161413"/>
+    <SolidColorBrush x:Key="Sk.Combo.Hover" Color="#201E1D"/>
+    <SolidColorBrush x:Key="Sk.Button" Color="#161413"/>
+    <SolidColorBrush x:Key="Sk.Button.Hover" Color="#201E1D"/>
+    <SolidColorBrush x:Key="Sk.Button.Pressed" Color="#121010"/>
+    <SolidColorBrush x:Key="Sk.Button.Inner" Color="#2A2826"/>
 
-    <!-- The gradient strip across the top of the menu -->
+    <!-- The thin strip across the top of the window: coral, like the forum's pulse line. -->
     <LinearGradientBrush x:Key="Sk.Rainbow" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Offset="0" Color="#37B1DA"/>
-        <GradientStop Offset="0.5" Color="#C954C0"/>
-        <GradientStop Offset="1" Color="#CCE336"/>
+        <GradientStop Offset="0" Color="#E8554B"/>
+        <GradientStop Offset="1" Color="#B23A33"/>
     </LinearGradientBrush>
 
     <!-- Color picker helpers -->
@@ -100,12 +88,14 @@
     <!--
         Runtime-replaced resources (see ThemeManager). Always reference these with
         DynamicResource so accent color / menu scale changes apply live.
+        Default accent is the forum's green (loaded scripts and online names share it).
     -->
-    <SolidColorBrush x:Key="Sk.Accent" Color="#9AC527"/>    <LinearGradientBrush x:Key="Sk.Accent.Gradient" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="#9AC527"/>
-        <GradientStop Offset="1" Color="#5C7617"/>
+    <SolidColorBrush x:Key="Sk.Accent" Color="#74C174"/>
+    <LinearGradientBrush x:Key="Sk.Accent.Gradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0" Color="#74C174"/>
+        <GradientStop Offset="1" Color="#45743F"/>
     </LinearGradientBrush>
-    <SolidColorBrush x:Key="Sk.Pattern" Color="#141414"/>
+    <SolidColorBrush x:Key="Sk.Pattern" Color="#0F0E0E"/>
     <ScaleTransform x:Key="Sk.Scale" ScaleX="1" ScaleY="1"/>
 
     <!-- Converters -->

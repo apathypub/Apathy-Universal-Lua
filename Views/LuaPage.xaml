@@ -23,7 +23,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <GroupBox Header="Scripts">
+        <GroupBox Header="scripts">
             <StackPanel>
                 <!-- Loaded scripts are drawn in the accent color. -->
                 <ListBox x:Name="ScriptList" Height="150" SelectionChanged="ScriptList_SelectionChanged">
@@ -76,7 +76,7 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Column="2" Header="Script">
+        <GroupBox Grid.Column="2" Header="script">
             <StackPanel>
                 <TextBlock x:Name="TitleValue" Margin="20,2,30,2" FontWeight="Bold" TextTrimming="CharacterEllipsis"
                            Text="Select a script"/>
@@ -105,7 +105,7 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Row="2" Grid.ColumnSpan="3" Header="Log">
+        <GroupBox Grid.Row="2" Grid.ColumnSpan="3" Header="log">
             <DockPanel>
                 <Button DockPanel.Dock="Bottom" Content="Clear" HorizontalAlignment="Left" Width="90"
                         Margin="20,4,0,4" Click="Clear_Click"/>

@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        UserText.Text = Session.Username;
 
         // Drag from any spot that isn't a control (controls mark the click as handled).
         // Clicks inside popups (dropdowns, color picker) also bubble up here, so ignore those.
