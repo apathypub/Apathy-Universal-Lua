@@ -71,6 +71,8 @@
                         <ComboBoxItem Content="200%"/>
                     </c:SkComboBox>
                     <CheckBox Content="Watermark" IsChecked="{Binding Watermark}"/>
+                    <Button Content="Log out" Click="Logout_Click"
+                            ToolTip="End this apathy.pub session and forget the remembered login"/>
                     <Button Content="Exit" Click="Exit_Click"/>
                 </StackPanel>
             </GroupBox>

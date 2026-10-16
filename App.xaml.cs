@@ -18,17 +18,28 @@ public partial class App : Application
         ThemeManager.InstallPattern();
         base.OnStartup(e);
 
+        // The loader won't start while a debugger or reverse-engineering tool is running.
+        if (SecurityGuard.IsBlocked(out string reason))
+        {
+            LuaLog.Write($"[security] loader blocked: {reason}");
+            MessageBox.Show($"Error: {SecurityGuard.ErrorCode}\n\napathy can't start while debugging or reverse-engineering software is running. Close it and try again.",
+                "apathy", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+            return;
+        }
+
         // Login first; the menu (and with it the input poller, overlay and scripts) only starts afterwards.
         // ShutdownMode is OnExplicitShutdown (App.xaml) so closing the login window doesn't end the app early.
-        var auth = new AuthService(AuthService.DefaultPath);
-        auth.EnsureSeeded();
-        var login = new LoginWindow(auth);
-        if (login.ShowDialog() != true)
+        // Only apathy.pub accounts with premium get past this; SessionGuard keeps checking afterwards.
+        var login = new LoginWindow();
+        if (login.ShowDialog() != true || login.Account is not { } account)
         {
             Shutdown();
             return;
         }
-        Session.Username = login.Username ?? Session.Username;
+        Session.Start(account);
+        SessionGuard.Start();
+        SecurityGuard.StartMonitoring();
 
         try
         {

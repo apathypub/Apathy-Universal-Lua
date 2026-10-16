@@ -66,9 +66,9 @@
                                 <!-- Both groups share one cell; the hidden one keeps its size so the window
                                      doesn't jump when switching from login to loading. -->
                                 <Grid Margin="22,0,22,22">
-                                    <GroupBox x:Name="LoginGroup" Header="Login">
+                                    <GroupBox x:Name="LoginGroup" Header="apathy.pub login">
                                         <StackPanel Margin="0,2,0,0">
-                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Username"/>
+                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Username or e-mail"/>
                                             <TextBox x:Name="UsernameBox" Height="22"/>
                                             <TextBlock Style="{StaticResource Sk.Label}" Text="Password"/>
                                             <PasswordBox x:Name="PasswordInput" Height="22"/>
@@ -76,6 +76,19 @@
                                             <Button x:Name="LoginButton" Content="Login" IsDefault="True" Height="27"
                                                     Margin="20,4,30,6" Click="Login_Click"/>
                                             <TextBlock x:Name="Status" Margin="20,0,30,4" TextWrapping="Wrap" Visibility="Collapsed"/>
+                                            <!-- Accounts and premium live on apathy.pub. -->
+                                            <StackPanel Orientation="Horizontal" Margin="20,2,30,4">
+                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="0" Foreground="{StaticResource Sk.TextMuted}">
+                                                    <Hyperlink x:Name="RegisterLink" Click="Register_Click"
+                                                               Foreground="{StaticResource Sk.TextMuted}">Create account</Hyperlink>
+                                                </TextBlock>
+                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="8,0" Text="·"
+                                                           Foreground="{StaticResource Sk.TextMuted}"/>
+                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="0">
+                                                    <Hyperlink x:Name="PremiumLink" Click="Premium_Click"
+                                                               Foreground="{DynamicResource Sk.Accent}">Get premium</Hyperlink>
+                                                </TextBlock>
+                                            </StackPanel>
                                         </StackPanel>
                                     </GroupBox>
 

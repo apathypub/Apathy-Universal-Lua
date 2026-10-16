@@ -101,7 +101,20 @@ public static class LuaApi
             ("concat(t, sep) -> string", "Joins a list of strings: table.concat(names, \", \")."),
             ("sort(t, less)", "Sorts a list in place; less(a, b) customises the order."),
             ("unpack(t) -> ...", "The elements of a list as separate values."),
-            ("pack(...) -> table", "The arguments as a list with a field n."));
+            ("pack(...) -> table", "The arguments as a list with a field n."),
+            ("keys(t) -> table", "The keys of a table as a list."),
+            ("values(t) -> table", "The values of a table as a list."),
+            ("count(t) -> number", "How many entries a table has (also non-list keys)."),
+            ("find(t, value) -> key", "The key of the first entry equal to value, or nil."),
+            ("contains(t, value) -> boolean", "True if some entry equals value."),
+            ("map(t, fn(v, k)) -> table", "A new table with fn applied to every value."),
+            ("filter(list, fn(v)) -> table", "The list entries for which fn returns true."),
+            ("reduce(list, fn(acc, v), start) -> value", "Folds a list into one value: table.reduce(t, function(a, v) return a + v end, 0)."),
+            ("slice(list, from, to) -> table", "Part of a list (from and to included)."),
+            ("reverse(list) -> table", "The list in reverse order."),
+            ("merge(a, b, ...) -> table", "A new table with the entries of all tables (later ones win)."),
+            ("copy(t) -> table", "A deep copy of a table."),
+            ("is_empty(t) -> boolean", "True when the table has no entries."));
 
         Module("math", "Math functions and constants.",
             ("abs(x)", "Absolute value."), ("ceil(x)", "Rounds up."), ("floor(x)", "Rounds down."),
@@ -142,7 +155,11 @@ public static class LuaApi
             ("null()", "The JSON null value."));
 
         // ---- apathy API ----
-        Global("log(text)", "Writes a line to the Output log.");
+        Global("log(...)", "Writes its arguments to the Output log; tables are shown in full.");
+        Global("inspect(value) -> string", "A readable dump of any value, tables included.");
+        Global("require(name) -> module", "Runs scripts\\lib\\name.lua (or .enma) once and returns what it returns. \"utils.text\" -> lib\\utils\\text.lua.");
+        Global("spawn(fn, ...) -> Task", "Runs fn as a task that can pause with wait(seconds) without blocking anything. Starts on the next tick.");
+        Global("wait(seconds)", "Pauses the current spawn() task; other code keeps running. Only inside spawn.");
         Global("clock() -> string", "Current time as \"HH:mm:ss\".");
         Global("on_tick(fn)", "fn runs every 50 ms while the script is loaded.");
         Global("on_unload(fn)", "fn runs when the script is stopped (restore what you changed here).");
@@ -180,6 +197,7 @@ public static class LuaApi
             ("set_accent(hex)", "Changes the menu accent color: menu.set_accent(\"#FF4060\")."),
             ("get_accent() -> string", "The accent color as \"#RRGGBB\"."),
             ("user() -> string", "The logged-in apathy user name."),
+            ("premium_until() -> number", "Unix time when the user's premium ends; nil for lifetime premium."),
             ("scripts() -> table", "Names of the scripts running now."),
             ("is_loaded(name) -> boolean", "True if the script with that name is running."));
 
@@ -269,10 +287,38 @@ public static class LuaApi
             ("post_click(x, y, button) -> boolean", "Clicks at screen point x, y inside the CS2 window by sending it straight to CS2; your cursor doesn't move. button 1 left (default), 2 right. False when CS2 isn't running." + Input),
             ("post_key(vk) -> boolean", "Taps a key in the CS2 window only (e.g. keys.ESCAPE), without it reaching other windows." + Input));
 
+        Module("storage", "Values kept between runs and restarts (nil, booleans, numbers, strings, tables). No permission needed.",
+            ("get(key, default) -> value", "The stored value, or default."),
+            ("set(key, value)", "Stores value (nil deletes it). Saved automatically."),
+            ("delete(key)", "Removes the key."),
+            ("keys() -> table", "All stored keys."),
+            ("clear()", "Removes everything this script stored."));
+
+        Module("events", "Messages between scripts (delivered on the next tick).",
+            ("on(name, fn(...)) -> Handler", "Calls fn whenever any script emits name."),
+            ("emit(name, ...)", "Sends name with values (nil, booleans, numbers, strings, tables) to every script listening."));
+        Returns["events.on"] = "Timer";
+
+        Module("base64", "Base64 text encoding.",
+            ("encode(text) -> string", "Text to Base64."),
+            ("decode(text) -> string", "Base64 back to text; nil if it isn't Base64."));
+
+        Module("hash", "Hashes as lowercase hex.",
+            ("sha256(text) -> string", "SHA-256 of the text."),
+            ("md5(text) -> string", "MD5 of the text (checksums only, not for security)."),
+            ("hmac_sha256(text, key) -> string", "HMAC-SHA256, e.g. for signing API requests."));
+
+        Module("util", "Small utilities.",
+            ("uuid() -> string", "A random unique id."),
+            ("random(min, max) -> number", "A cryptographically random whole number in min..max; util.random() gives 0..1."),
+            ("url_encode(text) -> string", "Escapes text for use in a URL."),
+            ("url_decode(text) -> string", "Reverses url_encode."));
+
         const string Http = " Needs  -- @permissions http";
         Module("http", "Web requests, answered asynchronously." + Http,
             ("get(url, fn(body, status, err))", "Downloads url (max 1 MB)." + Http),
-            ("post(url, body, fn(body, status, err), content_type)", "Posts body (default JSON)." + Http));
+            ("post(url, body, fn(body, status, err), content_type)", "Posts body (default JSON)." + Http),
+            ("request(options, fn(body, status, err, headers))", "Any request: { url = ..., method = \"PUT\", headers = { Authorization = \"Bearer ...\" }, body = ..., content_type = ... }. headers in the answer have lowercase names." + Http));
 
         const string Files = " Needs  -- @permissions files";
         Module("files", "The script's own data folder; plain file names." + Files,
@@ -304,6 +350,8 @@ public static class LuaApi
         Type("HudLine", ("get() -> string", "The current text."), ("set(text)", "Changes the text."),
              ("show(visible)", "Shows / hides the line."), ("visible() -> boolean", "True while shown."), ("remove()", "Removes the line."));
         Type("Timer", ("cancel()", "Stops the timer."), ("active() -> boolean", "True until it fired (after) or was cancelled."));
+        Type("Task", ("cancel()", "Stops the task at its next wait()."), ("active() -> boolean", "True until the task finished or was cancelled."));
+        Returns["spawn"] = "Task";
         Type("Me", ("name", "Your name."), ("team", "\"CT\" or \"T\"."), ("health", "0..100."), ("armor", "0..100."),
              ("helmet", "boolean."), ("money", "Current money."), ("equip_value", "Value of your equipment."),
              ("flashed", "0..255."), ("smoked", "0..255."), ("burning", "0..255."), ("kills", "Match kills."),

@@ -1,6 +1,5 @@
+using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -11,8 +10,8 @@ using Apathy.Services;
 namespace Apathy;
 
 /// <summary>
-/// Shown before the menu. After a successful login it plays a short loading bar and then
-/// closes with DialogResult = true.
+/// Shown before the menu. Logs in with an apathy.pub account that has premium (or a remembered
+/// session token); after that it plays a short loading bar and closes with DialogResult = true.
 /// </summary>
 public partial class LoginWindow : Window
 {
@@ -25,12 +24,11 @@ public partial class LoginWindow : Window
         ("Ready", 1.0, 250),
     ];
 
-    private readonly AuthService _auth;
+    private readonly CancellationTokenSource _cancel = new();
     private bool _closed;
 
-    public LoginWindow(AuthService auth)
+    public LoginWindow()
     {
-        _auth = auth;
         InitializeComponent();
 
         // Drag from any spot that isn't a control (text boxes and buttons handle their own clicks).
@@ -39,30 +37,54 @@ public partial class LoginWindow : Window
             if (e.ButtonState == MouseButtonState.Pressed) DragMove();
         };
         SourceInitialized += (_, _) => Native.DisableRoundedCorners(new WindowInteropHelper(this).Handle);
-        Loaded += (_, _) => FillRemembered();
-        Closed += (_, _) => _closed = true;
+        Loaded += async (_, _) => await ResumeRememberedAsync();
+        Closed += (_, _) =>
+        {
+            _closed = true;
+            _cancel.Cancel();
+        };
 
         StartLogoShine();
     }
 
     /// <summary>The account that logged in (set when DialogResult is true).</summary>
-    public string? Username { get; private set; }
+    public Account? Account { get; private set; }
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
-    private void FillRemembered()
+    private void Register_Click(object sender, RoutedEventArgs e) => OpenSite(AuthService.RegisterUrl);
+
+    private void Premium_Click(object sender, RoutedEventArgs e) => OpenSite(AuthService.PremiumUrl);
+
+    private static void OpenSite(Uri url) =>
+        Process.Start(new ProcessStartInfo(url.AbsoluteUri) { UseShellExecute = true });
+
+    // A remembered session logs straight in; an expired one just fills in the username.
+    private async Task ResumeRememberedAsync()
     {
-        if (RememberedLogin.Load() is { } saved)
-        {
-            UsernameBox.Text = saved.Username;
-            PasswordInput.Password = saved.Password;
-            RememberBox.IsChecked = true;
-            LoginButton.Focus();
-        }
-        else
+        if (RememberedLogin.Load() is not { } saved)
         {
             UsernameBox.Focus();
+            return;
         }
+
+        UsernameBox.Text = saved.Username;
+        RememberBox.IsChecked = true;
+        PasswordInput.Focus();
+        if (saved.Token is not { } token) return;
+
+        SetBusy(true, $"Logging in as {saved.Username}...");
+        var result = await AuthService.ResumeAsync(token, _cancel.Token);
+        if (_closed) return;
+        if (result.Account is { } account)
+        {
+            await FinishAsync(account);
+            return;
+        }
+
+        // Offline: keep the token for next time. Rejected: forget it.
+        if (result.Outcome != LoginOutcome.Offline) RememberedLogin.Save(saved.Username, null);
+        SetBusy(false, result.Message, error: true);
     }
 
     private async void Login_Click(object sender, RoutedEventArgs e)
@@ -71,41 +93,51 @@ public partial class LoginWindow : Window
         string password = PasswordInput.Password;
         if (username.Length == 0 || password.Length == 0)
         {
-            ShowStatus("Enter your username and password.", error: true);
+            ShowStatus("Enter your apathy.pub username and password.", error: true);
             return;
         }
 
-        LoginButton.IsEnabled = false;
-        ShowStatus("Logging in...", error: false);
-
-        bool ok;
-        try
-        {
-            ok = await Task.Run(() => _auth.Verify(username, password));
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or FormatException)
-        {
-            LoginButton.IsEnabled = true;
-            ShowStatus("Can't read the account list (users.json).", error: true);
-            return;
-        }
+        SetBusy(true, "Logging in...");
+        var result = await AuthService.LoginAsync(username, password, _cancel.Token);
         if (_closed) return;
 
-        if (!ok)
+        if (result.Account is not { } account)
         {
-            LoginButton.IsEnabled = true;
-            ShowStatus("Invalid username or password.", error: true);
-            PasswordInput.Clear();
-            PasswordInput.Focus();
+            SetBusy(false, result.Message, error: true);
+            // Wrong password: retype it. No premium: the account is right, show where to get it.
+            if (result.Outcome == LoginOutcome.WrongCredentials)
+            {
+                PasswordInput.Clear();
+                PasswordInput.Focus();
+            }
+            else if (result.Outcome == LoginOutcome.NoPremium)
+            {
+                PremiumLink.Focus();
+            }
+            else if (result.Outcome == LoginOutcome.DeviceLocked)
+            {
+                // Nothing to retype: the account simply belongs to another PC.
+                PasswordInput.Clear();
+            }
             return;
         }
+        await FinishAsync(account);
+    }
 
-        if (RememberBox.IsChecked == true) RememberedLogin.Save(username, password);
+    private async Task FinishAsync(Account account)
+    {
+        if (RememberBox.IsChecked == true) RememberedLogin.Save(account.Username, account.Token);
         else RememberedLogin.Clear();
 
-        Username = username;
-        await PlayLoadingAsync(username);
+        Account = account;
+        await PlayLoadingAsync(account.Username);
         if (!_closed) DialogResult = true;
+    }
+
+    private void SetBusy(bool busy, string message, bool error = false)
+    {
+        LoginButton.IsEnabled = UsernameBox.IsEnabled = PasswordInput.IsEnabled = !busy;
+        ShowStatus(message, error);
     }
 
     private async Task PlayLoadingAsync(string username)

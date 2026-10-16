@@ -1,0 +1,6 @@
+# /api/client/login, /api/client/session and /api/client/logout all go to index.php.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(login|session|logout)$ index.php?action=$1 [QSA,L]
+# Apache drops the Authorization header for PHP unless it is passed on explicitly.
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

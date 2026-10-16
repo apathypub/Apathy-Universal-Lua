@@ -19,6 +19,16 @@ public partial class MiscPage : UserControl
         if (Editor.EditorWindow.CloseForExit()) Application.Current.Shutdown();
     }
 
+    private async void Logout_Click(object sender, RoutedEventArgs e)
+    {
+        if (ConfirmDialog.Ask(Window.GetWindow(this), "Log out",
+                $"Log out of {Session.Username}? apathy will close and ask for your login next time.", "Log out", "Cancel") != true)
+            return;
+        RememberedLogin.Clear();
+        await AuthService.LogoutAsync(Session.Token);
+        if (Editor.EditorWindow.CloseForExit()) Application.Current.Shutdown();
+    }
+
     // Turning auto start on asks first; turning it off doesn't.
     private void AutoStart_Click(object sender, RoutedEventArgs e)
     {

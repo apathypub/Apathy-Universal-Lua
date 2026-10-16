@@ -19,7 +19,7 @@ namespace Apathy.Services;
 /// internet (http.*), their own data files (files.*), the clipboard and keyboard / mouse-click
 /// automation (input.*). There is no API that reads or writes the memory of other processes.
 /// </summary>
-public sealed class LuaHost : IScriptHost
+public sealed partial class LuaHost : IScriptHost
 {
     // Media virtual-key codes.
     private const byte VkMediaNext = 0xB0, VkMediaPrev = 0xB1, VkMediaPlayPause = 0xB3;
@@ -40,6 +40,11 @@ public sealed class LuaHost : IScriptHost
         public readonly List<LuaTimer> Timers = [];
         public readonly Dictionary<int, bool> KeyStates = []; // key_pressed: state at the previous call
         public readonly ConsoleTail ConsoleLog = new();
+        public readonly List<LuaTask> Tasks = [];
+        public readonly List<EventHandler> EventHandlers = [];
+        public System.Text.Json.Nodes.JsonObject? Storage; // storage.*, read on first use
+        public bool StorageDirty;
+        public bool InTask; // true while a spawn() task runs, so wait() can yield
     }
 
     // game.console_lines(): where this script left off in CS2's console.log.
@@ -269,6 +274,9 @@ public sealed class LuaHost : IScriptHost
 
         foreach (var callback in instance.UnloadCallbacks) SafeCall(instance, callback);
         foreach (var timer in instance.Timers) timer.Cancelled = true;
+        foreach (var task in instance.Tasks) task.Cancelled = true;
+        instance.EventHandlers.Clear();
+        SaveStorage(instance);
 
         // Remove the script's controls and HUD lines.
         if (instance.Panel != null) Panels.Remove(instance.Panel);
@@ -319,6 +327,10 @@ public sealed class LuaHost : IScriptHost
             }
             if (!SafeCall(instance, timer.Callback)) break; // script errored and was stopped
         }
+
+        RunTasks();
+        DeliverEvents();
+        foreach (var instance in _running.Values) SaveStorage(instance);
     }
 
     private static void UpdateKeybind(LuaKeybindControl control, bool capturing)
@@ -361,11 +373,19 @@ public sealed class LuaHost : IScriptHost
         }
         catch (InterpreterException ex)
         {
-            LuaLog.Write($"[{instance.Name}] error: {ex.DecoratedMessage}");
-            NotificationService.Show($"{instance.Name} stopped", ex.DecoratedMessage, NotificationKind.Error);
-            _running.Remove(instance.Name);
+            Fail(instance, ex);
             return false;
         }
+    }
+
+    // A script error stops the script and removes what it added (controls, HUD lines, island buttons).
+    private void Fail(Instance instance, InterpreterException ex)
+    {
+        LuaLog.Write($"[{instance.Name}] error: {ex.DecoratedMessage}");
+        NotificationService.Show($"{instance.Name} stopped", ex.DecoratedMessage, NotificationKind.Error);
+        if (!IsCurrent(instance)) return;
+        instance.UnloadCallbacks.Clear(); // don't run more of a script that just failed
+        Stop(instance.Name);
     }
 
     private bool IsCurrent(Instance instance) =>
@@ -410,6 +430,8 @@ public sealed class LuaHost : IScriptHost
             return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
         });
         menu["user"] = (Func<string>)(() => Session.Username);
+        // Unix time when the user's premium ends; nil for lifetime premium.
+        menu["premium_until"] = (Func<double?>)(() => Session.PremiumUntil?.ToUnixTimeSeconds());
         menu["scripts"] = DynValue.NewCallback((_, _) =>
         {
             var list = new Table(instance.Script);
@@ -502,6 +524,7 @@ public sealed class LuaHost : IScriptHost
         RegisterFiles(instance, g);
         RegisterClipboard(instance, g);
         RegisterInput(instance, g);
+        RegisterExtras(instance, g);
     }
 
     // time.ms() for animations, time.now() for timestamps, time.format(pattern) for display.
@@ -1007,8 +1030,9 @@ public sealed class LuaHost : IScriptHost
     }
 
     private async void Send(Instance instance, System.Net.Http.HttpMethod method, string url, string? body,
-                            string contentType, DynValue callback)
+                            string contentType, DynValue callback, List<(string Name, string Value)>? headers = null)
     {
+        Dictionary<string, string>? responseHeaders = null;
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
         {
             Answer(DynValue.Nil, 0, $"not an http(s) address: {url}");
@@ -1019,7 +1043,13 @@ public sealed class LuaHost : IScriptHost
         {
             using var request = new System.Net.Http.HttpRequestMessage(method, uri);
             if (body != null) request.Content = new System.Net.Http.StringContent(body, System.Text.Encoding.UTF8, contentType);
+            foreach (var (name, value) in headers ?? [])
+            {
+                if (!request.Headers.TryAddWithoutValidation(name, value)) request.Content?.Headers.TryAddWithoutValidation(name, value);
+            }
             using var response = await Http.SendAsync(request, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+            responseHeaders = response.Headers.Concat(response.Content.Headers)
+                .ToDictionary(h => h.Key.ToLowerInvariant(), h => string.Join(", ", h.Value));
             await using var stream = await response.Content.ReadAsStreamAsync();
             var buffer = new MemoryStream();
             var chunk = new byte[16 * 1024];
@@ -1036,7 +1066,8 @@ public sealed class LuaHost : IScriptHost
             Answer(DynValue.NewString(System.Text.Encoding.UTF8.GetString(buffer.GetBuffer(), 0, (int)buffer.Length)),
                    (int)response.StatusCode, null);
         }
-        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or TaskCanceledException or IOException)
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or TaskCanceledException or IOException
+                                       or InvalidOperationException or FormatException)
         {
             Answer(DynValue.Nil, 0, ex.Message);
         }
@@ -1045,8 +1076,10 @@ public sealed class LuaHost : IScriptHost
         {
             // The script may have been unloaded while the request was running.
             if (callback.Type != DataType.Function || !IsCurrent(instance)) return;
+            var headerTable = new Table(instance.Script);
+            foreach (var (name, value) in responseHeaders ?? []) headerTable[name] = value;
             SafeCall(instance, callback, result, DynValue.NewNumber(status),
-                     error == null ? DynValue.Nil : DynValue.NewString(error));
+                     error == null ? DynValue.Nil : DynValue.NewString(error), DynValue.NewTable(headerTable));
         }
     }
 

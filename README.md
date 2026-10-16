@@ -6,13 +6,22 @@ AI assistant, and **Enma**, a small language that compiles to Lua.
 
 ## Login
 
-| Username | Password |
-| --- | --- |
-| `1` | `1` |
+Log in with your [apathy.pub](https://apathy.pub) account. Only accounts with an active **premium**
+can use apathy; the login window links to registration and to premium.
 
-This demo account is created on first start in `users.json` next to the executable. Passwords are
-stored as PBKDF2-SHA256 hashes. To add accounts, edit `users.json` or replace `AuthService` with
-your own backend.
+- **Remember me** keeps a session token (encrypted for your Windows account), never the password.
+- While apathy runs it checks the session every 15 minutes. If premium ends or the session is revoked,
+  apathy shows a notice and closes. Without internet it keeps working and checks again later.
+- **Misc → Log out** ends the session.
+- Each account **locks to its PC** (HWID): the same login and password won't work on another computer,
+  so an account can't be shared. Moving to a new PC is a reset on apathy.pub.
+- The loader won't start while a debugger or reverse-engineering tool is running (it shows the error
+  `SRE`), and closes if one is started later.
+
+The site side (the API the app talks to, and how to install it) is described in
+[docs/apathy-pub-api.md](docs/apathy-pub-api.md); a PHP version is in `server/`.
+
+Debug builds also accept `1` / `1` without a server, for working on the UI.
 
 ## Features
 
@@ -47,7 +56,41 @@ and ChatLive, and buttons added by scripts. It can be dragged, locked or collaps
 The Lua and Enma API includes: `log`, `on_tick`, `on_unload`, `timer.after` / `timer.every`,
 `ui.*` controls (checkbox, slider, combo, color, keybind, button, label) that appear in the menu and
 are saved with configs, `hud.label` text on screen, `island.button`, `notify`, `confirm`, `color.*`,
-`json.*`, `time.*`, `keys.*`, media keys (`media.*`) and `menu.*`.
+`json.*`, `time.*`, `keys.*`, media keys (`media.*`) and `menu.*`. Also:
+
+| API | What it does |
+| --- | --- |
+| `require("name")` | Loads a shared module from `scripts\lib\name.lua` (or `.enma`) once and returns what it returns |
+| `spawn(fn)` + `wait(seconds)` | Code that pauses (sequences, animations, retries) without blocking apathy |
+| `storage.get` / `set` / `delete` / `keys` / `clear` | Values kept between runs and restarts; no permission needed |
+| `events.on(name, fn)` / `events.emit(name, ...)` | Messages between scripts |
+| `log(...)`, `print(...)`, `inspect(value)` | Any number of values; tables are printed in full |
+| `table.keys`, `values`, `count`, `find`, `contains`, `map`, `filter`, `reduce`, `slice`, `reverse`, `merge`, `copy`, `is_empty` | Table helpers |
+| `base64.*`, `hash.sha256` / `md5` / `hmac_sha256`, `util.uuid` / `random` / `url_encode` / `url_decode` | Encoding helpers |
+| `http.request{ url, method, headers, body }` | Any HTTP method with headers; the callback also gets the response headers (needs `http`) |
+
+```lua
+-- scripts/lib/greet.lua
+local M = {}
+function M.hello(name) return "hello, " .. name end
+return M
+```
+
+```lua
+-- @name Counter
+local greet = require("greet")
+local runs = storage.get("runs", 0) + 1
+storage.set("runs", runs)
+log(greet.hello(menu.user()), "run number", runs)
+
+spawn(function()
+    for i = 3, 1, -1 do
+        notify("Starting in " .. i)
+        wait(1)
+    end
+    events.emit("counter:ready", { runs = runs })
+end)
+```
 
 Extra abilities need a permission line at the top of the script, and apathy asks once before
 granting them:
@@ -130,12 +173,11 @@ Everything is stored next to the executable and is listed in `.gitignore`.
 
 | File / folder | Contents |
 | --- | --- |
-| `users.json` | Local accounts |
-| `login.json` | The remembered login (encrypted) |
+| `login.json` | The remembered apathy.pub login: username and encrypted session token |
 | `ai.key` | Your Anthropic API key (encrypted) |
 | `configs/` | Saved presets |
 | `scripts/` | Your scripts |
-| `data/` | Files written by scripts with the `files` permission |
+| `data/` | Files written by scripts with the `files` permission, and each script's `storage.json` |
 | `agents/` | Enma Studio agent profiles, evals and their history |
 
 ## Project layout
@@ -146,8 +188,10 @@ Everything is stored next to the executable and is listed in `.gitignore`.
 | `Controls/` | Custom controls: slider, color picker, keybind, combo boxes, tab icons |
 | `Themes/` | Colors and control styles |
 | `Overlay/` | Watermark, HUD lines and notification windows |
-| `Services/` | Script hosts (Lua, C#, C++), permissions, configs, CS2 Game State Integration, chat, login |
+| `Services/` | Script hosts (Lua, C#, C++), permissions, configs, CS2 Game State Integration, chat, apathy.pub login |
 | `Editor/` | Code editor, AI assistant and Enma Studio (`Editor/Agents`) |
 | `Enma/` | The Enma compiler: lexer, parser and Lua code generator |
 | `Models/` | Settings and script control models |
 | `scripts/` | Scripts copied next to the executable on build (empty by default) |
+| `server/` | The apathy.pub client API in PHP (goes on the website, not in the app) |
+| `docs/` | The client API description |

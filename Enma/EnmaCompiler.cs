@@ -40,7 +40,8 @@ public static class EnmaCompiler
         // apathy
         "log", "clock", "on_tick", "on_unload", "key_down", "key_pressed", "key_toggled", "system", "keys", "script",
         "timer", "time", "color", "json", "menu", "media", "spotify", "ui", "hud", "island", "platform", "notify",
-        "confirm", "game", "chat", "http", "files", "clipboard",
+        "confirm", "game", "chat", "http", "files", "clipboard", "input", "storage", "events", "spawn", "wait", "inspect",
+        "base64", "hash", "util",
     ];
 
     // Lua keywords that are ordinary names in Enma; such names get a "_" suffix.

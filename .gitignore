@@ -15,3 +15,6 @@ configs/
 agents/
 data/
 .env
+
+# Website API config: holds the database password
+server/config.php
