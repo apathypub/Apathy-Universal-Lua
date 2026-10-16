@@ -34,9 +34,9 @@ public static class AuthService
         (Environment.GetEnvironmentVariable("APATHY_API_URL") is { Length: > 0 } custom ? custom : "https://apathy.pub")
             .TrimEnd('/') + "/");
 
-    /// <summary>Where the login window sends people without an account or without premium.</summary>
-    public static Uri RegisterUrl { get; } = new(BaseUrl, "register");
-    public static Uri PremiumUrl { get; } = new(BaseUrl, "premium");
+    /// <summary>Where the login window sends people without an account or without premium (the website, not the API).</summary>
+    public static Uri RegisterUrl { get; } = new("https://apathy.pub/register.php");
+    public static Uri PremiumUrl { get; } = new("https://apathy.pub/premium.php");
 
     private static readonly HttpClient Http = CreateClient();
 

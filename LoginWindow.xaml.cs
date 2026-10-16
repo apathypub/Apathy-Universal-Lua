@@ -43,8 +43,6 @@ public partial class LoginWindow : Window
             _closed = true;
             _cancel.Cancel();
         };
-
-        StartLogoShine();
     }
 
     /// <summary>The account that logged in (set when DialogResult is true).</summary>
@@ -142,7 +140,7 @@ public partial class LoginWindow : Window
 
     private async Task PlayLoadingAsync(string username)
     {
-        WelcomeText.Text = $"Welcome back, {username}";
+        WelcomeText.Text = $"welcome back, {username}";
         LoginGroup.Visibility = Visibility.Hidden;
         LoadingGroup.Visibility = Visibility.Visible;
         LoadingGroup.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(150)));
@@ -150,7 +148,7 @@ public partial class LoginWindow : Window
         foreach (var (step, progress, milliseconds) in LoadingSteps)
         {
             if (_closed) return;
-            LoadingStep.Text = step + "...";
+            LoadingStep.Text = step.ToLowerInvariant() + "...";
             LoadingPercent.Text = (progress * 100).ToString("0", CultureInfo.InvariantCulture) + "%";
             ProgressScale.BeginAnimation(ScaleTransform.ScaleXProperty,
                 new DoubleAnimation(progress, TimeSpan.FromMilliseconds(milliseconds))
@@ -159,38 +157,6 @@ public partial class LoginWindow : Window
                 });
             await Task.Delay(milliseconds + 60);
         }
-    }
-
-    /// <summary>A lighter band sweeps across "thy" every few seconds.</summary>
-    private void StartLogoShine()
-    {
-        var accent = ((SolidColorBrush)FindResource("Sk.Accent")).Color;
-        var shine = Color.FromRgb(Lighten(accent.R), Lighten(accent.G), Lighten(accent.B));
-
-        // The gradient pads with the accent outside 0..1, so sliding it from -1 to 1 moves the band
-        // from fully off the left edge to fully off the right edge.
-        var slide = new TranslateTransform(-1, 0);
-        LogoAccent.Foreground = new LinearGradientBrush
-        {
-            StartPoint = new Point(0, 0),
-            EndPoint = new Point(1, 0),
-            RelativeTransform = slide,
-            GradientStops =
-            {
-                new GradientStop(accent, 0.25),
-                new GradientStop(shine, 0.5),
-                new GradientStop(accent, 0.75),
-            },
-        };
-
-        var sweep = new DoubleAnimationUsingKeyFrames { RepeatBehavior = RepeatBehavior.Forever };
-        sweep.KeyFrames.Add(new DiscreteDoubleKeyFrame(-1, KeyTime.FromTimeSpan(TimeSpan.Zero)));
-        sweep.KeyFrames.Add(new EasingDoubleKeyFrame(1, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(1.2)),
-            new SineEase { EasingMode = EasingMode.EaseInOut }));
-        sweep.KeyFrames.Add(new DiscreteDoubleKeyFrame(1, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(3))));
-        slide.BeginAnimation(TranslateTransform.XProperty, sweep);
-
-        static byte Lighten(byte channel) => (byte)(channel + (255 - channel) * 0.8);
     }
 
     private void ShowStatus(string text, bool error)

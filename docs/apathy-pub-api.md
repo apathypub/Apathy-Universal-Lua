@@ -21,7 +21,7 @@ A ready-made PHP version is in [`server/`](../server). It works with MySQL / Mar
    ```
 3. Run `server/schema.sql` on the site's database. It adds two tables (`apathy_client_sessions`,
    `apathy_client_attempts`) and doesn't change the existing ones.
-4. Make sure the site serves `/register` and `/premium` pages: the login window links to them.
+4. The login window links to `https://apathy.pub/register.php` and `https://apathy.pub/premium.php`.
 
 To let users move to a new PC, give the site a button that clears their row(s) in
 `apathy_client_devices` (`DELETE FROM apathy_client_devices WHERE user_id = ?`). The next login then

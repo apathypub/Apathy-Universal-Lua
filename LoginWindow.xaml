@@ -38,87 +38,67 @@
         </Style>
     </Window.Resources>
 
-    <!-- Same frame as MainWindow: 1px outline, 1px light, 4px mid, 1px light, gradient strip on top. -->
-    <Border Width="340" LayoutTransform="{DynamicResource Sk.Scale}"
-            BorderBrush="{StaticResource Sk.Outline}" BorderThickness="1">
-        <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
-            <Border BorderBrush="{StaticResource Sk.Frame.Mid}" BorderThickness="4">
-                <Border BorderBrush="{StaticResource Sk.Frame.Light}" BorderThickness="1">
-                    <Grid Background="{StaticResource Sk.Black}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1"/>
-                            <RowDefinition Height="1"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+    <!-- Flat forum look, same as the menu: one thin edge, the page colour, the wordmark with the
+         coral pulse, then plain fields. -->
+    <Border Width="320" LayoutTransform="{DynamicResource Sk.Scale}"
+            Background="{DynamicResource Sk.Pattern}"
+            BorderBrush="{StaticResource Sk.Line}" BorderThickness="1">
+        <Grid>
+            <StackPanel Margin="26,24,26,22">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,22">
+                    <TextBlock Text="apathy" FontFamily="{StaticResource Sk.Heading}" FontSize="20" FontWeight="Bold"/>
+                    <Polyline Points="0,6 7,6 10,1 14,11 18,6 40,6" Stroke="{StaticResource Sk.Coral}" StrokeThickness="1.4"
+                              StrokeLineJoin="Round" VerticalAlignment="Center" Margin="10,3,0,0"/>
+                </StackPanel>
 
-                        <Border Grid.Row="0" Background="{StaticResource Sk.Rainbow}"/>
-                        <Border Grid.Row="1" Background="{StaticResource Sk.Rainbow}" Opacity="0.5"/>
+                <!-- Both views share one cell; the hidden one keeps its size so the window
+                     doesn't jump when switching from login to loading. -->
+                <Grid>
+                    <StackPanel x:Name="LoginGroup">
+                        <TextBlock Text="username or e-mail" Margin="0,0,0,5" Foreground="{StaticResource Sk.TextMuted}"/>
+                        <TextBox x:Name="UsernameBox" Height="24" Margin="0,0,0,12"/>
+                        <TextBlock Text="password" Margin="0,0,0,5" Foreground="{StaticResource Sk.TextMuted}"/>
+                        <PasswordBox x:Name="PasswordInput" Height="24" Margin="0,0,0,12"/>
+                        <CheckBox x:Name="RememberBox" Content="remember me" Margin="0,0,0,14"/>
+                        <Button x:Name="LoginButton" Content="log in" IsDefault="True" Height="28" Margin="0,0,0,10"
+                                Click="Login_Click"/>
+                        <TextBlock x:Name="Status" Margin="0,0,0,10" TextWrapping="Wrap" Visibility="Collapsed"/>
 
-                        <Grid Grid.Row="2" Background="{DynamicResource Sk.Pattern}">
-                            <StackPanel>
-                                <!-- "thy" gets a moving shine (see StartLogoShine). -->
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,26,0,22"
-                                            TextElement.FontSize="26" TextElement.FontWeight="Bold">
-                                    <TextBlock Text="apa"/>
-                                    <TextBlock x:Name="LogoAccent" Text="thy" Foreground="{DynamicResource Sk.Accent}"/>
-                                </StackPanel>
-
-                                <!-- Both groups share one cell; the hidden one keeps its size so the window
-                                     doesn't jump when switching from login to loading. -->
-                                <Grid Margin="22,0,22,22">
-                                    <GroupBox x:Name="LoginGroup" Header="apathy.pub login">
-                                        <StackPanel Margin="0,2,0,0">
-                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Username or e-mail"/>
-                                            <TextBox x:Name="UsernameBox" Height="22"/>
-                                            <TextBlock Style="{StaticResource Sk.Label}" Text="Password"/>
-                                            <PasswordBox x:Name="PasswordInput" Height="22"/>
-                                            <CheckBox x:Name="RememberBox" Content="Remember me" Margin="0,2,0,6"/>
-                                            <Button x:Name="LoginButton" Content="Login" IsDefault="True" Height="27"
-                                                    Margin="20,4,30,6" Click="Login_Click"/>
-                                            <TextBlock x:Name="Status" Margin="20,0,30,4" TextWrapping="Wrap" Visibility="Collapsed"/>
-                                            <!-- Accounts and premium live on apathy.pub. -->
-                                            <StackPanel Orientation="Horizontal" Margin="20,2,30,4">
-                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="0" Foreground="{StaticResource Sk.TextMuted}">
-                                                    <Hyperlink x:Name="RegisterLink" Click="Register_Click"
-                                                               Foreground="{StaticResource Sk.TextMuted}">Create account</Hyperlink>
-                                                </TextBlock>
-                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="8,0" Text="·"
-                                                           Foreground="{StaticResource Sk.TextMuted}"/>
-                                                <TextBlock Style="{StaticResource Sk.Label}" Margin="0">
-                                                    <Hyperlink x:Name="PremiumLink" Click="Premium_Click"
-                                                               Foreground="{DynamicResource Sk.Accent}">Get premium</Hyperlink>
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-
-                                    <GroupBox x:Name="LoadingGroup" Header="Loading" Visibility="Hidden">
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock x:Name="WelcomeText" Style="{StaticResource Sk.Label}" Margin="20,0,30,10"/>
-                                            <Grid Margin="20,0,30,5">
-                                                <TextBlock x:Name="LoadingStep" Foreground="{StaticResource Sk.TextMuted}"/>
-                                                <TextBlock x:Name="LoadingPercent" HorizontalAlignment="Right"
-                                                           Foreground="{StaticResource Sk.TextMuted}"/>
-                                            </Grid>
-                                            <Border Height="7" Margin="20,0,30,6" BorderBrush="{StaticResource Sk.Black}"
-                                                    BorderThickness="1" Background="{StaticResource Sk.Slider.Track}">
-                                                <Border Background="{DynamicResource Sk.Accent.Gradient}" RenderTransformOrigin="0,0.5">
-                                                    <Border.RenderTransform>
-                                                        <ScaleTransform x:Name="ProgressScale" ScaleX="0"/>
-                                                    </Border.RenderTransform>
-                                                </Border>
-                                            </Border>
-                                        </StackPanel>
-                                    </GroupBox>
-                                </Grid>
+                        <!-- Accounts and premium live on apathy.pub. -->
+                        <Border BorderBrush="{StaticResource Sk.Line}" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock>
+                                    <Hyperlink x:Name="RegisterLink" Click="Register_Click" TextDecorations="{x:Null}"
+                                               Foreground="{StaticResource Sk.TextMuted}">register</Hyperlink>
+                                </TextBlock>
+                                <TextBlock Text="·" Margin="10,0" Foreground="{StaticResource Sk.TextFaint}"/>
+                                <TextBlock>
+                                    <Hyperlink x:Name="PremiumLink" Click="Premium_Click" TextDecorations="{x:Null}"
+                                               Foreground="{StaticResource Sk.Coral}">get premium</Hyperlink>
+                                </TextBlock>
                             </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                            <Button Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                    Margin="0,2,2,0" ToolTip="Close" AutomationProperties.Name="Close" Click="Close_Click"/>
+                    <StackPanel x:Name="LoadingGroup" VerticalAlignment="Center" Visibility="Hidden">
+                        <TextBlock x:Name="WelcomeText" Margin="0,0,0,14"/>
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock x:Name="LoadingStep" Foreground="{StaticResource Sk.TextMuted}"/>
+                            <TextBlock x:Name="LoadingPercent" HorizontalAlignment="Right" Foreground="{StaticResource Sk.TextMuted}"/>
                         </Grid>
-                    </Grid>
-                </Border>
-            </Border>
-        </Border>
+                        <Border Height="2" Background="{StaticResource Sk.Line}">
+                            <Border Background="{DynamicResource Sk.Accent}" RenderTransformOrigin="0,0.5">
+                                <Border.RenderTransform>
+                                    <ScaleTransform x:Name="ProgressScale" ScaleX="0"/>
+                                </Border.RenderTransform>
+                            </Border>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <Button Style="{StaticResource CloseButton}" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Margin="0,4,4,0" ToolTip="Close" AutomationProperties.Name="Close" Click="Close_Click"/>
+        </Grid>
     </Border>
 </Window>
