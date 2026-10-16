@@ -21,7 +21,8 @@ can use apathy; the login window links to registration and to premium.
 The site side (the API the app talks to, and how to install it) is described in
 [docs/apathy-pub-api.md](docs/apathy-pub-api.md); a PHP version is in `server/`.
 
-Debug builds also accept `1` / `1` without a server, for working on the UI.
+**Temporary:** the test account `1` / `1` logs in without a server in every build. Remove it by setting
+`TestAccount` to `false` in `Services/AuthService.cs`.
 
 ## Features
 

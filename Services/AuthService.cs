@@ -38,6 +38,11 @@ public static class AuthService
     public static Uri RegisterUrl { get; } = new("https://apathy.pub/register.php");
     public static Uri PremiumUrl { get; } = new("https://apathy.pub/premium.php");
 
+    // TEMPORARY test account 1 / 1: logs in without the server, in every build. Set to false (or delete
+    // this and the two checks using it) to remove it.
+    private const bool TestAccount = true;
+    private const string TestToken = "test-account";
+
     private static readonly HttpClient Http = CreateClient();
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
@@ -47,11 +52,8 @@ public static class AuthService
 
     public static Task<LoginResult> LoginAsync(string username, string password, CancellationToken ct = default)
     {
-#if DEBUG
-        // Debug builds only: log in without a server to work on the UI. Release builds have no offline account.
-        if (username == "1" && password == "1")
-            return Task.FromResult(new LoginResult(LoginOutcome.Ok, new Account("1", "debug", null), ""));
-#endif
+        if (TestAccount && username == "1" && password == "1")
+            return Task.FromResult(new LoginResult(LoginOutcome.Ok, new Account("1", TestToken, null), ""));
         var body = new LoginRequest(username, password, HardwareId.Value, ClientVersion);
         return SendAsync(() => new HttpRequestMessage(HttpMethod.Post, "api/client/login")
         {
@@ -62,9 +64,8 @@ public static class AuthService
     /// <summary>Checks a remembered token; also used to re-check premium while apathy runs.</summary>
     public static Task<LoginResult> ResumeAsync(string token, CancellationToken ct = default)
     {
-#if DEBUG
-        if (token == "debug") return Task.FromResult(new LoginResult(LoginOutcome.Ok, new Account("1", "debug", null), ""));
-#endif
+        if (TestAccount && token == TestToken)
+            return Task.FromResult(new LoginResult(LoginOutcome.Ok, new Account("1", TestToken, null), ""));
         return SendAsync(() =>
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "api/client/session");
